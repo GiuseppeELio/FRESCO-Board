@@ -9,10 +9,10 @@ The final rendering board looks like (TOP view) \n
 
 
 While the side view looks like
-![alt text](https://github.com/GiuseppeELio/PRC_Station/blob/main/Scheda_Wifi_Fan_3.png?raw=true)
+![alt text](https://github.com/GiuseppeELio/PRC_Station/blob/main/Scheda_WiFi_Fan_3.png?raw=true)
 
 The PCB board used as a shield board to avoid annoying wiring connection has the following scheme
 
-![alt text](https://github.com/GiuseppeELio/PRC_Station/blob/main/Scheda_Wifi_Fan_3.png?raw=true)
+![alt text](https://github.com/GiuseppeELio/PRC_Station/blob/main/PCB_footprint_arduino%20v28.pdf?raw=true)
 
 It is based on a 2-layer PCB. Here, the blue lines are the bottom layer and the red one is the top layer. 
