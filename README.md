@@ -2,7 +2,7 @@
 This work present a simple way to make an open source station to measure the themal eating, humidity and solar irradicance saving the data in local and sharing them by an IOT Cloud platform. 
 
 The final station looks like 
-![alt text](https://github.com/GiuseppeELio/PRC_Station/blob/main/Pictures/IMG_3586.HEIC?raw=true)
+![alt text](https://github.com/GiuseppeELio/PRC_Station/blob/main/Pictures/Real_PRC.jpg?raw=true)
 
 It allows measuring the temperature from 4 sensors applied to 4 different samples, + 1 for the ambient temperature and humidity and the solar irradiance, as reported in the following plot
 
