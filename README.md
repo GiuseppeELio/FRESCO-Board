@@ -41,9 +41,11 @@ https://github.com/GiuseppeELio/PRC_Station/blob/main/Libraries/OneWire-master.z
  https://github.com/GiuseppeELio/PRC_Station/blob/main/Libraries/SD-master.zip
  
  %%%------**ARDUINO CODE**-----%%%%
+ In the next lines you can find two version of the compiled code, the first one works only in local while the second one works as the first but includes also a wifi connection using an ESP8266 board. This implementation allows realizing an **IOT Cloud** platform exploting **ThingSpeak**. 
  
  Now step by step the code compiled on arduino are detailed and explained. 
  
+> **Version 1** works only in local. 
  Step 1 - Libraries
 ```
 #include "DHT.h"
@@ -260,3 +262,147 @@ void loop() {
   delay(5000);
 }
 ```
+
+> **Version 2** works in local and exploits a WIFI connection to exchange data in real time with an IOT cloud platform.
+> the code is https://github.com/GiuseppeELio/PRC_Station/blob/main/Measurement_4_sensors_WiFi.ino
+In brief here is reported only the new part with respect to the version 1. 
+
+Step 1 nothing change 
+Step 2 - definition
+```
+#define esp8266 Serial3
+```
+Step 3 - initialization 
+```
+String AP = "SSID";     // AP NAME
+String PASS = "PASS WIFI"; // AP PASSWORD
+String API = "API CODE";   // Write API KEY
+String HOST = "api.thingspeak.com";
+String PORT = "80";
+int countTrueCommand;
+int countTimeCommand;
+boolean found = false;
+```
+
+step 4-  Void setup **new part have been included**
+```
+esp8266.begin(115200);
+  sendCommand("AT", 5, "OK");
+  sendCommand("AT+CWMODE=1", 5, "OK");
+  sendCommand("AT+CWJAP=\"" + AP + "\",\"" + PASS + "\"", 20, "OK");
+
+```
+Step 5 - nothing change
+Step 5.1- It is a new step that include the conversion of the collected data into string
+```
+String getT1() {
+
+  sensors.requestTemperatures(); // Send the command to get temperatures
+  float temp = sensors.getTempCByIndex(0);
+  delay(100);
+  return String(temp);
+
+}
+
+String getT2() {
+
+  sensors2.requestTemperatures(); // Send the command to get temperatures
+  float tempC1 = sensors2.getTempCByIndex(0);
+  delay(100);
+  return String(tempC1);
+
+}
+
+String getT3() {
+
+  sensors3.requestTemperatures(); // Send the command to get temperatures
+  float tempC2 = sensors3.getTempCByIndex(0);
+  delay(100);
+  return String(tempC2);
+
+}
+
+String getT4() {
+
+  sensors4.requestTemperatures(); // Send the command to get temperatures
+  float tempC3 = sensors4.getTempCByIndex(0);
+  delay(100);
+  return String(tempC3);
+
+}
+
+
+String getTA() {
+
+  float t = dht.readTemperature();
+  delay(100);
+  return String(t);
+
+}
+
+String getHA() {
+  float h = dht.readHumidity();
+  delay(100);
+  return String(h);
+}
+
+String getIRR() {
+  uint16_t lux = lightMeter.readLightLevel();
+  float irr = (lux * 0.0079) * 3.9;
+  delay(100);
+  return String(irr);
+}
+
+void sendCommand(String command, int maxTime, char readReplay[]) {
+  Serial.print(countTrueCommand);
+  Serial.print(". at command => ");
+  Serial.print(command);
+  Serial.print(" ");
+  while (countTimeCommand < (maxTime * 0.10))
+  {
+    esp8266.println(command);//at+cipsend
+    if (esp8266.find(readReplay)) //ok
+    {
+      found = true;
+      break;
+    }
+
+    countTimeCommand++;
+  }
+
+  if (found == true)
+  {
+    Serial.println("OYI");
+    countTrueCommand++;
+    countTimeCommand = 0;
+  }
+
+  if (found == false)
+  {
+    Serial.println("Fail");
+    countTrueCommand = 0;
+    countTimeCommand = 0;
+  }
+
+  found = false;
+}
+```
+and Finally 
+Step 6- Void Loop 
+```
+void loop() {
+  loggingTemperature();
+  String getData = "GET /update?api_key=" + API + "&field1=" + getTA() + "&field2=" + getHA() + "&field3=" + getT1() + "&field4=" + getT2() + "&field5=" + getT3() + "&field6=" + getT4() + "&field7=" + getIRR();
+  sendCommand("AT+CIPMUX=1", 5, "OK");
+  sendCommand("AT+CIPSTART=0,\"TCP\",\"" + HOST + "\"," + PORT, 15, "OK");
+  sendCommand("AT+CIPSEND=0," + String(getData.length() + 4), 4, ">");
+  esp8266.println(getData); delay(1500); countTrueCommand++;
+  sendCommand("AT+CIPCLOSE=0", 5, "OK");
+  delay(5000);
+}
+```
+Here, in the last step is important to point out our attention on the 
+```
+String getData = "GET /update?api_key=" + API + "&field1=" + getTA() + "&field2=" + getHA() + "&field3=" + getT1() + "&field4=" + getT2() + "&field5=" + getT3() + "&field6=" + getT4() + "&field7=" + getIRR();
+```
+that is used to exchange the data converted into string with the ThingSpeak channel using AT command. 
