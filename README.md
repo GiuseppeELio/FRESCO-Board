@@ -1,5 +1,12 @@
-# PRC_Station
+%%%------** PRC_Station**------%%%
+This work present a simple way to make an open source station to measure the themal eating, humidity and solar irradicance saving the data in local and sharing them by an IOT Cloud platform. 
 
+The final station looks like 
+![alt text](https://github.com/GiuseppeELio/PRC_Station/blob/main/Pictures/IMG_3586.HEIC?raw=true)
+
+It allows measuring the temperature from 4 sensors applied to 4 different samples, + 1 for the ambient temperature and humidity and the solar irradiance, as reported in the following plot
+
+![alt text](https://github.com/GiuseppeELio/PRC_Station/blob/main/Pictures/Temp_4sample_07_20_No_Pellicola.png?raw=true)
 %%%------**HARDWARE DETAILS**------%%%
 
 The code and the electronic sketch to build a measurement station for Passive Radiative Cooling
@@ -16,7 +23,7 @@ While the side view looks like
 
 The PCB board used as a shield board to avoid annoying wiring connection has the following electronic scheme
 
-![alt text](https://github.com/GiuseppeELio/PRC_Station/blob/main/PCB_footprint_arduino%20v28.pdf?raw=true)
+![alt text](https://github.com/GiuseppeELio/PRC_Station/blob/main/Pictures/PCB_circuits.png?raw=true)
 
 It is based on a 2-layer PCB. Here, the blue lines are the bottom layer and the red one is the top layer. 
 
