@@ -25,9 +25,11 @@ It is based on a 2-layer PCB. Here, the blue lines are the bottom layer and the 
 In order to use the selected sensors such as: BH1750 (irradiance), Dallas DS18B20 (Temperature), DHT22 (temp and Humidity) and DS3231 (clocker)
 it is necessary to install/ include the following libraries 
 
-\textbf{BH1750} https://github.com/GiuseppeELio/PRC_Station/blob/main/Libraries/BH1750-1.3.0.zip
+BH1750 https://github.com/GiuseppeELio/PRC_Station/blob/main/Libraries/BH1750-1.3.0.zip
 
-Dalla DS18B20 https://github.com/GiuseppeELio/PRC_Station/blob/main/Libraries/DS18B20-master.zip and https://github.com/GiuseppeELio/PRC_Station/blob/main/Libraries/Dallas_temp.zip
+Dallas DS18B20 https://github.com/GiuseppeELio/PRC_Station/blob/main/Libraries/DS18B20-master.zip and https://github.com/GiuseppeELio/PRC_Station/blob/main/Libraries/Dallas_temp.zip
+with the dallas libraries it is also necessary to install the One Wire 
+https://github.com/GiuseppeELio/PRC_Station/blob/main/Libraries/OneWire-master.zip
 
 DHT22 https://github.com/GiuseppeELio/PRC_Station/blob/main/Libraries/DHT.zip
 
