@@ -16,7 +16,7 @@ The system is based on a Arduino development board. In the proposed case an Ardu
 
 The final board appear as reported in the following image
 
-![alt text](https://github.com/GiuseppeELio/PRC_Station/blob/main/Pictures/sketch_scheda.png?raw=true)
+![alt text](https://github.com/GiuseppeELio/PRC_Station/blob/main/sketch_scheda.png?raw=true)
 
 The final rendering board looks like (TOP view) \n
 ![alt text](https://github.com/GiuseppeELio/PRC_Station/blob/main/Scheda_Wifi_Fan_Top.png?raw=true)
