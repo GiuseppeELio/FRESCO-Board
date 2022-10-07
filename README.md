@@ -1,4 +1,4 @@
-# ------** PRC_Station**------
+#       PRC_Station
 
 ## Introduction and scope 
 
@@ -10,7 +10,7 @@ The final station looks like
 It allows measuring the temperature from 4 sensors applied to 4 different samples, + 1 for the ambient temperature and humidity and the solar irradiance, as reported in the following plot
 
 ![alt text](https://github.com/GiuseppeELio/PRC_Station/blob/main/Pictures/Temp_4sample_07_20_No_Pellicola.png?raw=true)
-## ------**Hardaware Details**------
+##       Hardaware Details
 
 The code and the electronic sketch to build a measurement station for Passive Radiative Cooling are shown in the next lines
 
@@ -34,7 +34,7 @@ The PCB board used as a shield board to avoid annoying wiring connection has the
 
 It is based on a 2-layer PCB. Here, the blue lines are the bottom layer and the red one is the top layer. 
 
-## ------**Software details**------
+##       Software details
 
 In order to use the selected sensors such as: BH1750 (irradiance), Dallas DS18B20 (Temperature), DHT22 (temp and Humidity) and DS3231 (clocker)
 it is necessary to install/ include the following libraries 
@@ -54,12 +54,13 @@ https://github.com/GiuseppeELio/PRC_Station/blob/main/Libraries/OneWire-master.z
  While for the **SD card reader** (jointed with the clocker allows building a data logger) it is necessary to install: 
  https://github.com/GiuseppeELio/PRC_Station/blob/main/Libraries/SD-master.zip
  
- ## ------**ARDUINO CODE**-----
+ ##       ARDUINO CODE
  In the next lines you can find two version of the compiled code, the first one works only in local while the second one works as the first but includes also a wifi connection using an ESP8266 board. This implementation allows realizing an **IOT Cloud** platform exploting **ThingSpeak**. 
  
  Now step by step the code compiled on arduino are detailed and explained. 
  
- #### **Version 1** works only in local. 
+ ####       Version 1
+ > works only in local. 
  Step 1 - Libraries
 ```
 #include "DHT.h"
@@ -280,7 +281,8 @@ void loop() {
 }
 ```
 
-#### **Version 2** works in local and exploits a WIFI connection to exchange data in real time with an IOT cloud platform.
+####        Version 2
+> It works in local and exploits a WIFI connection to exchange data in real time with an IOT cloud platform.
 
 > the code is https://github.com/GiuseppeELio/PRC_Station/blob/main/Measurement_4_sensors_WiFi.ino
 In brief here is reported only the new part with respect to the version 1. 
