@@ -1,5 +1,5 @@
 %%%------** PRC_Station**------%%%
-This work present a simple way to make an open source station to measure the themal eating, humidity and solar irradicance saving the data in local and sharing them by an IOT Cloud platform. 
+This work present a simple way to make an open source station to measure the themal heating (or cooling), humidity and solar irradicance saving the data in local and sharing them by an IOT Cloud platform. 
 
 The final station looks like 
 ![alt text](https://github.com/GiuseppeELio/PRC_Station/blob/main/Pictures/Real_PRC.jpg?raw=true)
@@ -9,10 +9,14 @@ It allows measuring the temperature from 4 sensors applied to 4 different sample
 ![alt text](https://github.com/GiuseppeELio/PRC_Station/blob/main/Pictures/Temp_4sample_07_20_No_Pellicola.png?raw=true)
 %%%------**HARDWARE DETAILS**------%%%
 
-The code and the electronic sketch to build a measurement station for Passive Radiative Cooling
+The code and the electronic sketch to build a measurement station for Passive Radiative Cooling are shown in the next lines
 
 
 The system is based on a Arduino development board. In the proposed case an Arduino due has been used.
+
+The final board appear as reported in the following image
+
+![alt text](https://github.com/GiuseppeELio/PRC_Station/blob/main/Pictures/sketch_scheda.png?raw=true)
 
 The final rendering board looks like (TOP view) \n
 ![alt text](https://github.com/GiuseppeELio/PRC_Station/blob/main/Scheda_Wifi_Fan_Top.png?raw=true)
@@ -68,11 +72,14 @@ https://github.com/GiuseppeELio/PRC_Station/blob/main/Libraries/OneWire-master.z
 
 Step 2- Sensors definition 
 ```
-#define DHTPIN 3
+#define DHTPIN 7
 #define ONE_WIRE_BUS 2
-#define ONE_WIRE_BUS2 4
-#define ONE_WIRE_BUS3 5
-#define ONE_WIRE_BUS4 6
+#define ONE_WIRE_BUS2 3
+#define ONE_WIRE_BUS3 4
+#define ONE_WIRE_BUS4 5
+#define ONE_WIRE_BUS5 6
+#define ONE_WIRE_BUS6 8 /* Sensor on board*/
+#define esp8266 Serial1
 #define DHTTYPE DHT22   // DHT 22  (AM2302)
 ```
 Step 3- Inizialization (sensors and devices)
