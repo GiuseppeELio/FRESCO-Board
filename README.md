@@ -17,9 +17,15 @@ The code and the electronic sketch to build a measurement station for Passive Ra
 
 The system is based on a Arduino development board. In the proposed case an Arduino due has been used.
 
-The final board appear as reported in the following image
+The manufactured board appear as reported in the following image
 
 ![alt text](https://github.com/GiuseppeELio/PRC_Station/blob/main/sketch_scheda.png?raw=true)
+
+In order to realize this Arduino shield with all connection and connector for thermal measurements, the design has been initially designed in Fusion 360, you can use a PCB software that you prefer. \n
+
+First step: draw the PCB using a two layer board, top layer appears in red and the bottom one is blue. The combination of the two layers is also reported for a cohmprensive view. 
+
+![alt text](https://github.com/GiuseppeELio/PRC_Station/blob/main/Pictures/PCB_Wiring_sketch.png?raw=true)
 
 The final rendering board looks like (TOP view) \n
 ![alt text](https://github.com/GiuseppeELio/PRC_Station/blob/main/Scheda_Wifi_Fan_Top.png?raw=true)
@@ -27,12 +33,6 @@ The final rendering board looks like (TOP view) \n
 
 While the side view looks like
 ![alt text](https://github.com/GiuseppeELio/PRC_Station/blob/main/Scheda_WiFi_Fan_3.png?raw=true)
-
-The PCB board used as a shield board to avoid annoying wiring connection has the following electronic scheme
-
-![alt text](https://github.com/GiuseppeELio/PRC_Station/blob/main/Pictures/PCB_circuits.png?raw=true)
-
-It is based on a 2-layer PCB. Here, the blue lines are the bottom layer and the red one is the top layer. 
 
 ##       Software details
 
