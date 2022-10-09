@@ -33,7 +33,7 @@ Once the PCB dra is ready, the design can be inspected and produced by a virtual
 Finally, the PCB is produced by CAM, using a 3D cad software, the rendering of the final system is reported. It is useful to know the footprint of each component, the required space and how the final system will appear. 
 
 The final rendering, along a top view and two lateral ones of the board is \n
-![alt text](https://github.com/GiuseppeELio/PRC_Station/blob/main/Pictures/Render_Board_annotations_1.png?raw=true)
+![alt text](https://github.com/GiuseppeELio/PRC_Station/blob/main/Pictures/Render_Board_annotations_2.png?raw=true)
 
 
 ##       Software details
