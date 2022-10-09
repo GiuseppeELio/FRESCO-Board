@@ -7,13 +7,12 @@ This work present a simple way to make an open source station to measure the the
 The final station looks like 
 ![alt text](https://github.com/GiuseppeELio/PRC_Station/blob/main/Pictures/Real_PRC.jpg?raw=true)
 
-It allows measuring the temperature from 4 sensors applied to 4 different samples, + 1 for the ambient temperature and humidity and the solar irradiance, as reported in the following plot
+It allows measuring the temperature from 6 sensors applied to 4 different samples, another one inside the box to measure the temperature above the area covered by samples, another one is used to measure the temperature close to the electronic apparatus, and another one for the ambient temperature and humidity. The system is also equipped with a sensor to measure the solar irradiance. All this measured value are reported in the following plot
 
 ![alt text](https://github.com/GiuseppeELio/PRC_Station/blob/main/Pictures/Temp_4sample_07_20_No_Pellicola.png?raw=true)
 ##       Hardaware Details
 
-The code and the electronic sketch to build a measurement station for Passive Radiative Cooling are shown in the next lines
-
+The code and the electronic sketch to build a measurement station for Passive Radiative Cooling are shown in the next lines \n
 
 The system is based on a Arduino development board. In the proposed case an Arduino due has been used.
 
@@ -27,12 +26,15 @@ First step: draw the PCB using a two layer board, top layer appears in red and t
 
 ![alt text](https://github.com/GiuseppeELio/PRC_Station/blob/main/Pictures/PCB_Wiring_sketch.png?raw=true)
 
-The final rendering board looks like (TOP view) \n
-![alt text](https://github.com/GiuseppeELio/PRC_Station/blob/main/Scheda_Wifi_Fan_Top.png?raw=true)
+Once the PCB dra is ready, the design can be inspected and produced by a virtual process, well known as CAM, thar allows seeing the final shape and the board footprint. Here, the top layer and the bottom one are reported as they will be produced during the PCB manufacturing.
 
+![alt text](https://github.com/GiuseppeELio/PRC_Station/blob/main/Pictures/Produced_PCB_2D.png?raw=true)
 
-While the side view looks like
-![alt text](https://github.com/GiuseppeELio/PRC_Station/blob/main/Scheda_WiFi_Fan_3.png?raw=true)
+Finally, the PCB is produced by CAM, using a 3D cad software, the rendering of the final system is reported. It is useful to know the footprint of each component, the required space and how the final system will appear. 
+
+The final rendering, along a top view and two lateral ones of the board is \n
+![alt text](https://github.com/GiuseppeELio/PRC_Station/blob/main/Pictures/Render_Board_annotations_1.png?raw=true)
+
 
 ##       Software details
 
