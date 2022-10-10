@@ -448,7 +448,7 @@ String getData = "GET /update?api_key=" + API + "&field1=" + getTA() + "&field2=
 }
 ```
 getT1, getT2, getT3, getT4 and getT5 are related to the sensors placed above the samples or into the box to monitor the "ambient/box" temperature. getIRR is used for the irradiance and getTA and getHA for the ambient temperature and humidity, respectively. It exist also the function getT_oB that is not recalled in line #441 and it represents the temperature read on the board, close to the electronic components. 
-Here, in the last step is important to point out our attention on the 
+Here, in the last step is important to point out our attention on the following code line
 ```
 String getData = "GET /update?api_key=" + API + "&field1=" + getTA() + "&field2=" + getHA() + "&field3=" + getT1() + "&field4=" + getT2() + "&field5=" + getT3() + "&field6=" + getT4() + "&field7=" + getT5() + "&field8=" + getIRR();
 ```
