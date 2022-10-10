@@ -12,7 +12,7 @@ It allows measuring the temperature from 6 sensors applied to 4 different sample
 ![alt text](https://github.com/GiuseppeELio/PRC_Station/blob/main/Pictures/Temp_4sample_07_20_No_Pellicola.png?raw=true)
 ##       Hardaware Details
 
-The code and the electronic sketch to build a measurement station for Passive Radiative Cooling are shown in the next lines \n
+The code and the electronic sketch to build a measurement station for Passive Radiative Cooling are shown in the next lines
 
 The system is based on a Arduino development board. In the proposed case an Arduino due has been used.
 
@@ -20,7 +20,7 @@ The manufactured board appear as reported in the following image
 
 ![alt text](https://github.com/GiuseppeELio/PRC_Station/blob/main/sketch_scheda.png?raw=true)
 
-In order to realize this Arduino shield with all connection and connector for thermal measurements, the design has been initially designed in Fusion 360, you can use a PCB software that you prefer. \n
+In order to realize this Arduino shield with all connection and connector for thermal measurements, the design has been initially designed in Fusion 360, you can use a PCB software that you prefer.
 
 First step: draw the PCB using a two layer board, top layer appears in red and the bottom one is blue. The combination of the two layers is also reported for a cohmprensive view. 
 
@@ -32,7 +32,7 @@ Once the PCB dra is ready, the design can be inspected and produced by a virtual
 
 Finally, the PCB is produced by CAM, using a 3D cad software, the rendering of the final system is reported. It is useful to know the footprint of each component, the required space and how the final system will appear. 
 
-The final rendering, along a top view and two lateral ones of the board is \n
+The final rendering, along a top view and two lateral ones of the board is
 ![alt text](https://github.com/GiuseppeELio/PRC_Station/blob/main/Pictures/Render_Board_annotations_2.png?raw=true)
 
 
@@ -85,61 +85,68 @@ Step 2- Sensors definition
 #define ONE_WIRE_BUS4 5
 #define ONE_WIRE_BUS5 6
 #define ONE_WIRE_BUS6 8 /* Sensor on board*/
-#define esp8266 Serial1
 #define DHTTYPE DHT22   // DHT 22  (AM2302)
 ```
 Step 3- Inizialization (sensors and devices)
 
 ```
-DHT dht(DHTPIN, DHTTYPE, 20); //for Arduino "due" is important to define also the clock frequency -20-
-const int chipSelect = 10; //select the pin that you prefer dor the SD card reader pin
-**OneWire oneWire(ONE_WIRE_BUS);
-DallasTemperature sensors(&oneWire);** //the bold code highlight the code used to initialize a Dallas sensors 
+DHT dht(DHTPIN, DHTTYPE, 20);
+
+const int chipSelect = 9;
+
+OneWire oneWire(ONE_WIRE_BUS);
+DallasTemperature sensors(&oneWire);
+
 OneWire oneWire2(ONE_WIRE_BUS2);
 DallasTemperature sensors2(&oneWire2);
+
 OneWire oneWire3(ONE_WIRE_BUS3);
 DallasTemperature sensors3(&oneWire3);
+
 OneWire oneWire4(ONE_WIRE_BUS4);
 DallasTemperature sensors4(&oneWire4);
-BH1750 lightMeter; //Irradiance sensors initialized it is connected on SDA and SCL
-File myFile;  // Create a file to store the data
-// RTC
-RTC_DS3231 rtc; // clocker initialized it is also connected on SDA and SCL
+
+OneWire oneWire5(ONE_WIRE_BUS5);
+DallasTemperature sensors5(&oneWire5);
+
+OneWire oneWire6(ONE_WIRE_BUS6);
+DallasTemperature sensors6(&oneWire6);
+
+BH1750 lightMeter;
+
+File myFile; // Create a file to store the data
+
+RTC_DS3231 rtc; //clocker initialized it is also connected on SDA and SCL
 ```
 Step 4- Void Setup (Arduino fuction)
 ```
 void setup() {
   Serial.begin(9600);
   dht.begin();
-  sensors.begin(); //arduino starts to read data from sensors
+  //Serial.println("Dallas Temperature IC Control");
+  sensors.begin();
   sensors2.begin();
   sensors3.begin();
   sensors4.begin();
-  //sensors5.begin();
-
+  sensors5.begin();
+  sensors6.begin();
   Wire.begin();
   lightMeter.begin();
-
-  //Serial.println(F("BH1750 Test begin"));
   Serial.println("DHT22, Dallas Temp IC Control and BH1750");
-
   // setup for the SD card
   Serial.print("Initializing SD card...");
-
   if (!SD.begin(chipSelect)) {
     Serial.println("initialization failed!");
     return;
   }
   Serial.println("initialization done.");
-
   //open file
   myFile = SD.open("DATA.txt", FILE_WRITE);
-
   // if the file opened ok, write to it:
   if (myFile) {
     Serial.println("File opened ok");
     // print the headings for our data
-    myFile.println("Date,Time, Umidity %, Temperature amb ºC,Temperature 1 ºC, Temperature2 ºC, Temperature3 ºC, Temperature4 ºC");
+    myFile.println("Date,Time, Umidity %, Temperature amb ºC,Temperature 1 ºC, Temperature2 ºC, Temperature3 ºC, Temperature4 ºC,Temperature5 ºC,Temperature_On_Board ºC");
   }
   myFile.close();
   
@@ -147,14 +154,11 @@ void setup() {
     Serial.println("Couldn't find RTC");
     while (1);
   }
-
   if (rtc.lostPower()) {
     Serial.println("RTC lost power, lets set the time!");
-
-    // Comment out below lines once you set the date & time.
+    //Comment out below lines once you set the date & time.
     //rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
   }
-
 }
 ```
 Step 5- Temperature and data reading/ storing
@@ -164,31 +168,29 @@ void loggingTemperature() {
   // Read temperature as Celsius
   float t = dht.readTemperature();
   // Read temperature as Fahrenheit
-  float f = dht.readTemperature(true);
 
   // Check if any reads failed and exit early (to try again).
   if (isnan(h) || isnan(t) || isnan(f)) {
     Serial.println("Failed to read from DHT sensor!");
     return;
   }
-
-  //float hi = dht.computeHeatIndex(f, h);
-
   sensors.requestTemperatures(); // Send the command to get temperatures
-  float tempC = sensors.getTempCByIndex(0);
+  float tempC1 = sensors.getTempCByIndex(0);
 
   sensors2.requestTemperatures(); // Send the command to get temperatures
-  float tempC1 = sensors2.getTempCByIndex(0);
+  float tempC2 = sensors2.getTempCByIndex(0);
 
   sensors3.requestTemperatures(); // Send the command to get temperatures
-  float tempC2 = sensors3.getTempCByIndex(0);
+  float tempC3 = sensors3.getTempCByIndex(0);
 
   sensors4.requestTemperatures(); // Send the command to get temperatures
-  float tempC3 = sensors4.getTempCByIndex(0);
+  float tempC4 = sensors4.getTempCByIndex(0);
 
-  //sensors5.requestTemperatures(); // Send the command to get temperatures
-  //float tempC4 = sensors5.getTempCByIndex(0);
+  sensors5.requestTemperatures(); // Send the command to get temperatures
+  float tempC5 = sensors5.getTempCByIndex(0);
 
+  sensors6.requestTemperatures(); // Send the command to get temperatures
+  float tempC_oB = sensors6.getTempCByIndex(0);
   uint16_t lux = lightMeter.readLightLevel();
   float irr = (lux * 0.0079) * 3.9;
 
@@ -213,16 +215,18 @@ void loggingTemperature() {
     myFile.println("\n");
     myFile.print(t);
     myFile.println("\n");
-    myFile.print(tempC);
-    myFile.println("\n");
     myFile.print(tempC1);
     myFile.println("\n");
     myFile.print(tempC2);
     myFile.println("\n");
     myFile.print(tempC3);
     myFile.println("\n");
-    // myFile.print(tempC4);
-    // myFile.println("\n");
+    myFile.print(tempC4);
+    myFile.println("\n");
+    myFile.print(tempC5);
+    myFile.println("\n");
+    myFile.print(tempC_oB);
+    myFile.println("\n");
     myFile.print(irr);
     myFile.println("\n");
   }
@@ -250,20 +254,23 @@ void loggingTemperature() {
   //Serial.println(" *F");
   //Serial.print("\n");
   Serial.print("Temperature for the device 1 (index 0) is: ");
-  Serial.println(tempC);
-  Serial.print("\n");
-  Serial.print("Temperature for the device 2 (index 1) is: ");
   Serial.println(tempC1);
   Serial.print("\n");
-  Serial.print("Temperature for the device 3 (index 2) is: ");
+  Serial.print("Temperature for the device 2 (index 1) is: ");
   Serial.println(tempC2);
   Serial.print("\n");
-  Serial.print("Temperature for the device 4 (index 3) is: ");
+  Serial.print("Temperature for the device 3 (index 2) is: ");
   Serial.println(tempC3);
   Serial.print("\n");
-  //Serial.print("Temperature for the device 5 (index 4) is: ");
-  //Serial.println(tempC4);
-  //Serial.print("\n");
+  Serial.print("Temperature for the device 4 (index 3) is: ");
+  Serial.println(tempC4);
+  Serial.print("\n");
+  Serial.print("Temperature for the device 5 (index 4) is: ");
+  Serial.println(tempC5);
+  Serial.print("\n");
+    Serial.print("Temperature on Board (index 5) is: ");
+  Serial.println(tempC_oB);
+  Serial.print("\n");
   Serial.print("Light: ");
   Serial.print(irr);
   Serial.println("W/m2");
@@ -284,7 +291,7 @@ void loop() {
 ```
 
 ####        Version 2
-> It works in local and exploits a WIFI connection to exchange data in real time with an IOT cloud platform.
+> It works as the one used in local but it also exploits a WIFI connection (ESP8266) to exchange data in real time with an IOT cloud platform (ThingSpeak).
 
 > the code is https://github.com/GiuseppeELio/PRC_Station/blob/main/Measurement_4_sensors_WiFi.ino
 In brief here is reported only the new part with respect to the version 1. 
@@ -292,13 +299,14 @@ In brief here is reported only the new part with respect to the version 1.
 Step 1 nothing change 
 Step 2 - definition
 ```
-#define esp8266 Serial3
+#define esp8266 Serial1 
 ```
+Serial1 means the Tx1 and Rx1 of arduino due, it is possible to use Serial, Serial2 or Seriel3 to use Tx and Rxor Tx2 and Rx2 or Tx3 and RX3, respectively.
 Step 3 - initialization 
 ```
 String AP = "SSID";     // AP NAME
-String PASS = "PASS WIFI"; // AP PASSWORD
-String API = "API CODE";   // Write API KEY
+String PASS = "PASSWORD"; // AP PASSWORD
+String API = "Write API Key";   // Write API KEY
 String HOST = "api.thingspeak.com";
 String PORT = "80";
 int countTrueCommand;
@@ -312,7 +320,6 @@ esp8266.begin(115200);
   sendCommand("AT", 5, "OK");
   sendCommand("AT+CWMODE=1", 5, "OK");
   sendCommand("AT+CWJAP=\"" + AP + "\",\"" + PASS + "\"", 20, "OK");
-
 ```
 Step 5 - nothing change
 Step 5.1- It is a new step that include the conversion of the collected data into string
@@ -320,39 +327,56 @@ Step 5.1- It is a new step that include the conversion of the collected data int
 String getT1() {
 
   sensors.requestTemperatures(); // Send the command to get temperatures
-  float temp = sensors.getTempCByIndex(0);
+  float tempC1 = sensors.getTempCByIndex(0);
   delay(100);
-  return String(temp);
+  return String(tempC1);
 
 }
 
 String getT2() {
 
   sensors2.requestTemperatures(); // Send the command to get temperatures
-  float tempC1 = sensors2.getTempCByIndex(0);
+  float tempC2 = sensors2.getTempCByIndex(0);
   delay(100);
-  return String(tempC1);
+  return String(tempC2);
 
 }
 
 String getT3() {
 
   sensors3.requestTemperatures(); // Send the command to get temperatures
-  float tempC2 = sensors3.getTempCByIndex(0);
+  float tempC3 = sensors3.getTempCByIndex(0);
   delay(100);
-  return String(tempC2);
+  return String(tempC3);
 
 }
 
 String getT4() {
 
   sensors4.requestTemperatures(); // Send the command to get temperatures
-  float tempC3 = sensors4.getTempCByIndex(0);
+  float tempC4 = sensors4.getTempCByIndex(0);
   delay(100);
-  return String(tempC3);
+  return String(tempC4);
 
 }
 
+String getT5() {
+
+  sensors5.requestTemperatures(); // Send the command to get temperatures
+  float tempC5 = sensors5.getTempCByIndex(0);
+  delay(100);
+  return String(tempC5);
+
+}
+
+String getT_oB() {
+
+  sensors6.requestTemperatures(); // Send the command to get temperatures
+  float tempC_oB = sensors6.getTempCByIndex(0);
+  delay(100);
+  return String(tempC_oB);
+
+}
 
 String getTA() {
 
@@ -414,7 +438,7 @@ Step 6- Void Loop
 ```
 void loop() {
   loggingTemperature();
-  String getData = "GET /update?api_key=" + API + "&field1=" + getTA() + "&field2=" + getHA() + "&field3=" + getT1() + "&field4=" + getT2() + "&field5=" + getT3() + "&field6=" + getT4() + "&field7=" + getIRR();
+String getData = "GET /update?api_key=" + API + "&field1=" + getTA() + "&field2=" + getHA() + "&field3=" + getT1() + "&field4=" + getT2() + "&field5=" + getT3() + "&field6=" + getT4() + "&field7=" + getT5() + "&field8=" + getIRR();
   sendCommand("AT+CIPMUX=1", 5, "OK");
   sendCommand("AT+CIPSTART=0,\"TCP\",\"" + HOST + "\"," + PORT, 15, "OK");
   sendCommand("AT+CIPSEND=0," + String(getData.length() + 4), 4, ">");
@@ -423,8 +447,9 @@ void loop() {
   delay(5000);
 }
 ```
+getT1, getT2, getT3, getT4 and getT5 are related to the sensors placed above the samples or into the box to monitor the "ambient/box" temperature. getIRR is used for the irradiance and getTA and getHA for the ambient temperature and humidity, respectively. It exist also the function getT_oB that is not recalled in line #441 and it represents the temperature read on the board, close to the electronic components. 
 Here, in the last step is important to point out our attention on the 
 ```
-String getData = "GET /update?api_key=" + API + "&field1=" + getTA() + "&field2=" + getHA() + "&field3=" + getT1() + "&field4=" + getT2() + "&field5=" + getT3() + "&field6=" + getT4() + "&field7=" + getIRR();
+String getData = "GET /update?api_key=" + API + "&field1=" + getTA() + "&field2=" + getHA() + "&field3=" + getT1() + "&field4=" + getT2() + "&field5=" + getT3() + "&field6=" + getT4() + "&field7=" + getT5() + "&field8=" + getIRR();
 ```
 that is used to exchange the data converted into string with the ThingSpeak channel using AT command. 
