@@ -7,12 +7,12 @@ This work present a simple way to build an open source station to measure the th
 The final station looks like 
 ![alt text](https://github.com/GiuseppeELio/PRC_Station/blob/main/Pictures/Real_PRC.jpg?raw=true)
 
-It allows measuring the temperature from 6 sensors applied to 4 different samples (T1, T2, T3 and T4), another one inside the box (Tbox) to measure the temperature above the area covered by samples, another one is used to measure the temperature close to the electronic apparatus (identified as T_board), and another one for the ambient temperature (Tamb) and humidity. The system is also equipped with a sensor to measure the solar irradiance. Techical details about the electronic components used for this goal is reported in the next lines. All this measured value are reported in the following plot
-
+It allows measuring the temperature from 6 sensors applied to 4 different samples (T1, T2, T3 and T4), another one inside the box (Tbox) to measure the temperature above the area covered by samples, another one is used to measure the temperature close to the electronic apparatus (identified as T_board), and another one for the ambient temperature (Tamb) and humidity. The system is also equipped with a sensor to measure the solar irradiance. Techical details about the electronic components used for this goal is reported in the next lines. All this measured value are reported in the following plots
+*
 ![alt text](https://github.com/GiuseppeELio/FRESCO-Board/blob/main/Pictures/20_10_22_data.png?raw=true)
-A differnet way to plot the data, the difference between the Tamb and the Tbox, and the Tsample versus Tamb and Tbox, allows to evaluate the consistence about all the sensors placed in the polystyrene box, they reports the same value in their standard deviation (accuracy ± 0.5°C).
+* A differnet way to plot the data, the difference between the Tamb and the Tbox, and the Tsample versus Tamb and Tbox, allows to evaluate the consistence about all the sensors placed in the polystyrene box, they reports the same value in their standard deviation (accuracy ± 0.5°C).
 ![alt text](https://github.com/GiuseppeELio/FRESCO-Board/blob/main/Pictures/Date_28-1_10_22_Tdiff.png?raw=true)
-After that we conducted a couple of measurements across different days on different materials that posseses or not passive radiative cooling features reveling the following behaviours as reported in the next two plots. 
+* After that we conducted a couple of measurements across different days on different materials that posseses or not passive radiative cooling features reveling the following behaviours as reported in the next two plots. 
 * The plots shows in the top panel the temperature for Tamb, T1, T2, T3, T4 and Tbox while the bottom one displays the humidity and the irradiance.
 ![alt text](https://github.com/GiuseppeELio/FRESCO-Board/blob/main/Pictures/Date_28-1_10_22_data.png?raw=true)
 * These other plots report the difference between the Tamb and Tbox, the T of each samples versus the Tamb or versus the Tbox.
