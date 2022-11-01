@@ -7,9 +7,11 @@ This work present a simple way to make an open source station to measure the the
 The final station looks like 
 ![alt text](https://github.com/GiuseppeELio/PRC_Station/blob/main/Pictures/Real_PRC.jpg?raw=true)
 
-It allows measuring the temperature from 6 sensors applied to 4 different samples, another one inside the box to measure the temperature above the area covered by samples, another one is used to measure the temperature close to the electronic apparatus, and another one for the ambient temperature and humidity. The system is also equipped with a sensor to measure the solar irradiance. All this measured value are reported in the following plot
+It allows measuring the temperature from 6 sensors applied to 4 different samples (T1, T2, T3 and T4), another one inside the box (Tbox) to measure the temperature above the area covered by samples, another one is used to measure the temperature close to the electronic apparatus (identified as T_board), and another one for the ambient temperature (Tamb) and humidity. The system is also equipped with a sensor to measure the solar irradiance. Techical details about the electronic components used for this goal is reported in the next lines. All this measured value are reported in the following plot
 
-![alt text](https://github.com/GiuseppeELio/PRC_Station/blob/main/Pictures/Temp_4sample_07_20_No_Pellicola.png?raw=true)
+![alt text](https://github.com/GiuseppeELio/FRESCO-Board/blob/main/Pictures/20_10_22_data.png?raw=true)
+A differnet way to plot the data, the difference between the Tamb and the Tbox, and the Tsample versus Tamb and Tbox, allows to evaluate the consistence about all the sensors placed in the polystyrene box, they reports the same value in their standard deviation (accuracy ± 0.5°C).
+![alt text](https://github.com/GiuseppeELio/FRESCO-Board/blob/main/Pictures/Date_28-1_10_22_Tdiff.png?raw=true)
 ##       Hardaware Details
 
 The code and the electronic sketch to build a measurement station for Passive Radiative Cooling are shown in the next lines
