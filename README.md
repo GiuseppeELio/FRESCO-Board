@@ -1,5 +1,5 @@
 #       PRC Station
-
+![alt text](https://github.com/GiuseppeELio/FRESCO-Board/blob/Tdrop-and-ESP/Pictures/Fresco_Logo_3.png)
 ## Introduction and scope 
 
 This work present a simple way to build an open source station to measure the themal heating (or cooling), humidity and solar irradicance saving the data in local and sharing them by an IOT Cloud platform over ThingSpeak (through cloud or local server). 
