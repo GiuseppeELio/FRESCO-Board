@@ -82,7 +82,7 @@ void setup() {
   Sensors_initialization();
   RTC_initialization();
   SD_initialization();
-  delay(2000); //to be setted again at 15000
+  delay(20000); //to be setted again at 15000
   Wifi_status();
   init_screen();
   /**/
