@@ -19,7 +19,7 @@ U8GLIB_SSD1306_128X64 u8g(U8G_I2C_OPT_NONE | U8G_I2C_OPT_DEV_0);  // I2C / TWI
 #define DHTPIN3 15
 #define ONE_WIRE_BUS2 8 /* Sensor on board*/ /*Remember to not put it in the parallel line of the sensors that go in the external box*/
 #define DHTTYPE DHT22                        // DHT 22  (AM2302)
-#define esp8266 Serial2                      //RX and TX settled on Serial2 --> RX2 and TX2 of Arduino Mega
+#define esp8266 Serial1                      //RX and TX settled on Serial2 --> RX2 and TX2 of Arduino Mega
 /*NTC parameters*/
 #define RT0 10000  // Ω
 #define B 3380     //  K NTC part number NXFT15XH103FA2B100 or 3455
