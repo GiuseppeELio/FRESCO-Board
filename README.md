@@ -1,5 +1,5 @@
 #       PRC Station
-![alt text](Pictures/Fresco_Logo_3.png)
+![alt text](Fresco_Logo_3.png)
 ## Introduction and scope 
 
 The code reported in this repository are related to a data logger realization able to measure the temperature drop and the cooling power of "passive radiative cooling" samples.
