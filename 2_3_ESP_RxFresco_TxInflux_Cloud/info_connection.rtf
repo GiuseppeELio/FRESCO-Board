@@ -1,0 +1,95 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2639
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fnil\fcharset0 HelveticaNeue;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;}
+{\*\expandedcolortbl;;\cssrgb\c0\c0\c0\c49804;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww16100\viewh12640\viewkind0
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 #define INFLUXDB_URL "https://eu-central-1-1.aws.cloud2.influxdata.com"\
+\
+#define INFLUXDB_TOKEN "mmgECr09xgRY6RXLdh9F2sBMSEHi58qJMqJdH7JH27a3dBVSEKmRUhFfjBz3-2T6F93xQWCrQ9fIyOvQxq-SFA=="\
+\
+#define INFLUXDB_ORG "e0d3abd288c600cd"\
+\
+#define INFLUXDB_BUCKET "ESP8266"\
+\
+\
+\
+Command style to query the data in Graphing\
+\
+SELECT time, "Temp_Board"\
+FROM "Measurements"\
+WHERE time >= now() - interval '15 minutes'\
+  AND ("Temp_Board" IS NOT NULL)\
+\
+%%%%\
+\
+Private InfluxDB on Giuseppe\'92s MAC OS\
+\
+URL http://localhost:8086\
+URL http://
+\f1\fs26 \cf2 192.168.1.138:8086
+\f0\fs24 \cf0 \
+\
+TOKEN \
+\pard\pardeftab720\partightenfactor0
+\cf0 yGToHnQyBrwQ080vRmppdPGz6InSGJfZPOZo3b0h0_QbmGDaFu5tfdEM-Zyn_-0sFp-NikikJgdKddJ-kVkRBg==\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf0 \
+Bucket ESP8266\
+\
+ORG profile lio\
+ORG ID 79cdc04c61776dab\
+\
+%%%%%%%%%%%%%%%%\
+\
+Test over Maxwell \
+\
+INFLUX US:complex Pass ComplexPhotonics1 \
+GRAFANA US:admin Pass ComplexPhotonics1\
+\
+URL http://150.217.157.114:8086\
+\
+TOKEN \
+T5Mha_564bDgGXFXS1NORsmckyGlF-ycL9wap5xGFVI0AegeihCPIOQ64UHFHEn1qtyfhpzSS9k4N53crYYULA==\
+\
+BUCKET Lab\
+\
+ORG ID 584dc700716ba6b2\
+\
+\
+%%Raspberry new\
+\
+INFLUXDB V2 Username ComplexPhot\
+			Password ComplexPhotonics1\
+\
+GRAFANA Username complexphot\
+			Pass ComplexPhotonics1 \
+\
+INFLUX URL {\field{\*\fldinst{HYPERLINK "ospite9.lens.unifi.it:8086"}}{\fldrslt http://ospite9.lens.unifi.it:8086}}\
+\
+ORG name Lab9\
+ORG ID 6cc48fad215b4767\
+\
+BUCKET ESP8266\
+\
+TOKEN INFLUX\
+MJ17QXFUjQYTmKGxhEpuUXlOnDU5IJPaVOWG2rDYC0-nVUuQ3kWbO91Y-sx7rKAlsmMMTKRIKitgR3GS_9ws9A==\
+\
+\pard\pardeftab720\partightenfactor0
+\cf0 #define INFLUXDB_URL "http://ospite9.lens.unifi.it:8086"\
+#define INFLUXDB_TOKEN "c4zCSNlCJlIkkonaVXIOs9x0TyH4CV_8xOrZlk71oSn_Fp8edHj4w3rvYB_u2YnTLdqQfZgxmuQzJGxFe2_KgQ==" \
+#define INFLUXDB_ORG "6cc48fad215b4767"\
+#define INFLUXDB_BUCKET "ESP8266"\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf0 \
+\pard\pardeftab720\partightenfactor0
+\cf0 \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf0 \
+RETE test Office 200 (LIO)\
+\
+SSD Prova_Net\
+Password LamiaPassword1!\
+\
+}
