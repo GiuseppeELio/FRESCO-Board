@@ -4,7 +4,7 @@
 
 The code reported in this repository are related to a data logger realization able to measure the temperature drop and the cooling power of "passive radiative cooling" samples. The device is covered by the OSHWA certificate with the UID IT0000015 and the details are available at the [following link](https://certification.oshwa.org/it000015.html) 
 <p align="right">
-  <img src="doc/certification-mark-IT000015-wide.png" />
+  <img src="certification-mark-IT000015-wide.png" />
 </p>
 ![alt text](new_boxe_v35.png)
 
