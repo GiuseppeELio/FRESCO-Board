@@ -13,6 +13,12 @@ The board as shown in the figure is composed by a main board, a TDrop shield tha
 
 ##       Software details
 
+<p align="right">
+  <img src="doc/img/workflow_FRESCO.png" />
+</p>
+
+The schematic representation reports the workflow among Arduino, the ESP8266 for the WiFi communication, data exchange and remote storage using a local server (Raspberry) or cloud based on InfluxDB V2 and Grafana for the data visualization.
+
 In order to use the selected sensors such as: BH1750 (irradiance), Dallas DS18B20 (Temperature), DHT22 (temp and Humidity) and DS3231 (clocker)
 it is necessary to install/ include the following libraries 
 
