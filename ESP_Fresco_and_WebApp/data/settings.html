@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f0f0f0;
+    }
+
+    .topnav {
+      background-color: #0A1128;
+      overflow: hidden; 
+      color: white;
+      text-align: center;
+      padding: 10px;
+    }
+ .topnav h1 {
+      margin: 0;
+      color: white; /* Set title color to white */
+    }
+    .content {
+      max-width: 800px;
+      margin: 20px auto;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h1,
+    h2 {
+      color: #333;
+    }
+
+    .parameter {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    input[type="text"],
+    select {
+      width: calc(100% - 22px);
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-sizing: border-box;
+    }
+
+    button {
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      padding: 10px 20px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .parameter-group {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+
+    .parameter {
+      flex-basis: 48%;
+      margin-bottom: 20px;
+    }
+
+    .parameter input[type="text"] {
+      width: 100%;
+    }
+
+    .parameter label {
+      margin-bottom: 5px;
+    }
+
+    .parameter-group .parameter:nth-child(odd) {
+      margin-right: 4%;
+    }
+
+    .parameter-group .parameter:last-child {
+      margin-right: 0;
+    }
+
+    a {
+      color: #007bff;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+    
+    .parameter-group#pcool-parameters {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+/* Adjust width to accommodate two parameters per line */
+.parameter-group#pcool-parameters .parameter {
+  flex-basis: 48%; /* Adjust width to fit two parameters per line */
+  margin-bottom: 20px;
+}
+  </style>
+</head>
+
+<body>
+  <div class="topnav">
+    <h1>Setting Parameters</h1>
+  </div>
+
+  <div class="content">
+  <form action="/settings" method="POST">
+    <h2>ON ESP8266</h2>
+    <div class="parameter">
+      <label for="ntp">NTP:</label>
+      <select id="ntp" name="ntp">
+        <option value="ntp.unifi.it">ntp.unifi.it</option>
+        <option value="ntp1.inrim.it">ntp1.inrim.it</option>
+        <option value="at.pool.ntp.org">at.pool.ntp.org</option>
+        <option value="europe.pool.ntp.org">europe.pool.ntp.org</option>
+        <option value="oceania.pool.ntp.org">oceania.pool.ntp.org</option>
+        <option value="asia.pool.ntp.org">asia.pool.ntp.org</option>
+        <option value="north-america.pool.ntp.org">north-america.pool.ntp.org</option>
+        <option value="south-america.pool.ntp.org">south-america.pool.ntp.org</option>
+      </select>
+    </div>
+
+    <div class="parameter">
+      <label for="tz_info">TZ_INFO (TZ code available <a href="https://github.com/nayarsystems/posix_tz_db/blob/master/zones.csv" target="_blank">here</a>):</label>
+      <input type="text" id="tz_info" name="tz_info" value="CET-1CEST,M3.5.0,M10.5.0/3">
+    </div>
+
+    <h2>To be passed to Arduino</h2>
+    <div class="parameter-group">
+      <div class="parameter">
+        <label for="ntc_b_value">NTC B Value:</label>
+        <input type="text" id="ntc_b_value" name="ntc_b_value" value="3380">
+      </div>
+
+      <div class="parameter">
+        <label for="data_transfer_time">Data Transfer Time (ms):</label>
+        <input type="text" id="data_transfer_time" name="data_transfer_time" value="10000">
+      </div>
+
+      <div class="parameter">
+        <label for="saving_time">Saving Time (ms):</label>
+        <input type="text" id="saving_time" name="saving_time" value="1000">
+      </div>
+
+      <div class="parameter">
+        <label for="displaying_time">Displaying Time (ms):</label>
+        <input type="text" id="displaying_time" name="displaying_time" value="5000">
+      </div>
+
+      <div class="parameter">
+        <label for="irr_cal">Irradiance cal. (see manual):</label>
+        <input type="text" id="irr_cal" name="irr_cal" value="2.2">
+      </div>
+    </div>
+    
+    <div id="pcool-dashboard">
+    <div class="parameter-group" id="pcool-dashboard">
+      <div class="parameter">
+        <label for="pid_set_point">PID Set Point (&deg;C):</label>
+        <input type="text" id="pid_set_point" name="pid_set_point" value="t">
+      </div>
+
+      <div class="parameter">
+        <label for="sample_surface">Sample Surface (m<sup>2</sup>):</label>
+        <input type="text" id="sample_surface" name="sample_surface" value="0.0036">
+      </div>
+    </div>
+    </div>
+    <!-- Submit button -->
+   <input type ="submit" value ="Submit">
+    </form>
+  </div>
+  <script src="script.js"></script>
+  
+</body>
+
+</html>
