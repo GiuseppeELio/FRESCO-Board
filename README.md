@@ -26,6 +26,13 @@ it is necessary to install/ include the available [libraries](https://github.com
 
 As reported in the pdf file ["FRESCO Board startup_Software"](https://github.com/GiuseppeELio/FRESCO-Board/blob/main/doc/FRESCO%20Board%20startup_Software.pdf) the FRESCO board is equipped with a WiFi network board to communicate and exchange information through a network and show the data directly on your device by a hot spot netwrok or connecting on the local IP of the selected WiFi. On the other hand, it allows sending the data on a remote server using Raspberry or a Linux PC/Server and then save the data on "InfluxDB V2" and display them on "Grafana" dashboard. 
 
+## Python Temperature drop and Cooling power analysis 
+Using the provided Jupyter Notebook [FRESCO_Tdrop_PCool_analysis.ipynb](https://github.com/GiuseppeELio/FRESCO-Board/blob/main/FRESCO_Tdrop_PCool_analysis.ipynb) is it possible to display all the information collected using FRESCO and have an immediate look to the passive radiative cooling material features. An example is reported below. 
+
+<p align="right">
+  <img src="doc/img/Example_Data_analysis.png" />
+</p>
+
 ## Grafana Dashboard
 
 An example of the dashboard displaying the usefull data is reported below
