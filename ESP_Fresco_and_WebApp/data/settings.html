@@ -133,6 +133,7 @@
       <select id="ntp" name="ntp">
         <option value="ntp.unifi.it">ntp.unifi.it</option>
         <option value="ntp1.inrim.it">ntp1.inrim.it</option>
+        <option value="0.pool.ntp.org">0.pool.ntp.org</option>
         <option value="at.pool.ntp.org">at.pool.ntp.org</option>
         <option value="europe.pool.ntp.org">europe.pool.ntp.org</option>
         <option value="oceania.pool.ntp.org">oceania.pool.ntp.org</option>
@@ -170,7 +171,7 @@
       </div>
 
       <div class="parameter">
-        <label for="irr_cal">Irradiance cal. (see manual):</label>
+        <label for="irr_cal">Irradiance cal. (<a href="https://github.com/GiuseppeELio/FRESCO-Board/blob/main/doc/FRESCO%20Board%20startup_Software.pdf" target="_blank">see manual</a>):</label>
         <input type="text" id="irr_cal" name="irr_cal" value="2.2">
       </div>
     </div>
@@ -178,8 +179,8 @@
     <div id="pcool-dashboard">
     <div class="parameter-group" id="pcool-dashboard">
       <div class="parameter">
-        <label for="pid_set_point">PID Set Point (&deg;C):</label>
-        <input type="text" id="pid_set_point" name="pid_set_point" value="t">
+        <label for="pid_set_point">PID Set Point (&deg;C): (<a href="https://github.com/GiuseppeELio/FRESCO-Board/blob/main/doc/FRESCO_IO_descript.pdf" target="_blank">Sensors name at</a>):</label>
+        <input type="text" id="pid_set_point" name="pid_set_point" value="1">
       </div>
 
       <div class="parameter">

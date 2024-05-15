@@ -17,23 +17,6 @@
       width: calc(100% - 170px); /* Adjust as needed */
     }
   </style>
-  <script>
-    function toggleCloudFields() {
-      var cloudFields = document.getElementById("cloudFields");
-      var dbSection = document.getElementById("dbSection");
-      var isChecked = document.getElementById("cloudSwitch").checked;
-      cloudFields.style.display = isChecked ? "block" : "none";
-      dbSection.style.display = isChecked ? "none" : "block";
-    }
-
-    function clearFields() {
-      document.getElementById("INFLUXDB_URL").value = "";
-      document.getElementById("INFLUXDB_DB_NAME").value = "";
-      document.getElementById("INFLUXDB_ORG").value = "";
-      document.getElementById("INFLUXDB_BUCKET").value = "";
-      document.getElementById("INFLUXDB_TOKEN").value = "";
-    }
-  </script>
 </head>
 <body>
   <div class="topnav">
@@ -45,22 +28,13 @@
         <form action="/database" method="POST">
           <p>
             <label for="INFLUXDB_URL">INFLUX_URL</label>
-            <input type="text" id="INFLUXDB_URL" name="INFLUXDB_URL" value="http://localhost:8086"><br>
-            <div id="dbSection">
-              <label for="INFLUXDB_DB_NAME">DB_NAME</label>
-              <input type="text" id="INFLUXDB_DB_NAME" name="INFLUXDB_DB_NAME" value="home"><br>
-            </div>
-            <label for="influxdb">Select InfluxDB</label><br>
-            <input type="checkbox" id="cloudSwitch" onchange="toggleCloudFields()">
-            <label for="cloudSwitch">Cloud</label><br>
-            <div id="cloudFields" style="display: none;">
-              <label for="INFLUXDB_ORG">INFLUXDB_ORG</label>
-              <input type="text" id="INFLUXDB_ORG" name="INFLUXDB_ORG"><br>
-              <label for="INFLUXDB_BUCKET">INFLUXDB_BUCKET</label>
-              <input type="text" id="INFLUXDB_BUCKET" name="INFLUXDB_BUCKET"><br>
-              <label for="INFLUXDB_TOKEN">INFLUXDB_TOKEN</label>
-              <input type="text" id="INFLUXDB_TOKEN" name="INFLUXDB_TOKEN"><br>
-            </div>
+            <input type="text" id="INFLUXDB_URL" name="INFLUXDB_URL"><br>
+            <label for="INFLUXDB_ORG">INFLUXDB_ORG</label>
+            <input type="text" id="INFLUXDB_ORG" name="INFLUXDB_ORG"><br>
+            <label for="INFLUXDB_BUCKET">INFLUXDB_BUCKET</label>
+            <input type="text" id="INFLUXDB_BUCKET" name="INFLUXDB_BUCKET"><br>
+            <label for="INFLUXDB_TOKEN">INFLUXDB_TOKEN</label>
+            <input type="text" id="INFLUXDB_TOKEN" name="INFLUXDB_TOKEN"><br>
             <input type="submit" value="Submit">
             <button type="button" onclick="clearFields()">Clear</button>
           </p>

@@ -6,6 +6,34 @@
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
   <link rel="stylesheet" type="text/css" href="style.css">
+  <style>
+    label {
+      display: inline-block;
+      width: 150px; /* Adjust as needed */
+      text-align: right;
+      margin-right: 10px; /* Adjust as needed */
+    }
+    input[type="text"] {
+      width: calc(100% - 170px); /* Adjust as needed */
+    }
+  </style>
+  <script>
+    function toggleWiFiFields() {
+      var wifiFields = document.getElementById("wifiFields");
+      var academicNetworkFields = document.getElementById("academicNetworkFields");
+      var isChecked = document.getElementById("wifiToggle").checked;
+      wifiFields.style.display = isChecked ? "none" : "block";
+      academicNetworkFields.style.display = isChecked ? "block" : "none";
+    }
+
+    function clearFields() {
+      document.getElementById("ssid").value = "";
+      document.getElementById("pass").value = "";
+      document.getElementById("academicSsid").value = "";
+      document.getElementById("academicUser").value = "";
+      document.getElementById("academicPass").value = "";
+    }
+  </script>
 </head>
 <body>
   <div class="topnav">
@@ -16,15 +44,25 @@
       <div class="card">
         <form action="/wifimanager" method="POST">
           <p>
-            <label for="ssid">SSID</label>
-            <input type="text" id ="ssid" name="ssid"><br>
-            <label for="pass">Password</label>
-            <input type="text" id ="pass" name="pass"><br>
-<!--            <label for="ip">IP Address</label>
-            <input type="text" id ="ip" name="ip" value="192.168.1.200"><br>
-            <label for="gateway">Gateway Address</label>
-            <input type="text" id ="gateway" name="gateway" value="192.168.1.1"><br>-->
-            <input type ="submit" value ="Submit">
+            <input type="checkbox" id="wifiToggle" onchange="toggleWiFiFields()">
+            <label for="wifiToggle">Enable Academic Network</label><br>
+            <div id="wifiFields">
+              <label for="ssid">SSID</label>
+              <input type="text" id="ssid" name="ssid"><br>
+              <label for="pass">Password</label>
+              <input type="text" id="pass" name="pass"><br>
+            </div>
+            <div id="academicNetworkFields" style="display: none;">
+              <label for="academicSsid">Academic SSID</label>
+              <input type="text" id="academicSsid" name="academicSsid"><br>
+              <label for="academicUser">Username <span style="font-size: 0.8em;">(Use your academic ID@domainuniversity.com)</span></label>
+              <label for="academicUser">Username</label>
+              <input type="text" id="academicUser" name="academicUser"><br>
+              <label for="academicPass">Password</label>
+              <input type="text" id="academicPass" name="academicPass"><br>
+            </div>
+            <input type="submit" value="Submit">
+            <button type="button" onclick="clearFields()">Clear</button>
           </p>
         </form>
       </div>
