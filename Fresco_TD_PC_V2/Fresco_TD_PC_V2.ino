@@ -48,7 +48,8 @@
 #define R_LOAD 100
 #define PSUPPLY_VOLTAGE 12
 #define R_AMPLI 39
-int SAMPLE_SURFACE = 0.0036;
+const float Sample_Surface_Default = 0.0036;
+float SAMPLE_SURFACE;
 
 /* Analog pins */
 #define PIN_NTC0 A15
@@ -76,7 +77,7 @@ int SAMPLE_SURFACE = 0.0036;
 #define DHTPIN3 15
 #define ONE_WIRE_BUS2 8 /* Sensor on board*/ /*Remember to not put it in the parallel line of the sensors that go in the external box*/
 #define DHTTYPE DHT22                        // DHT 22  (AM2302)
-#define esp8266 Serial1                      //RX and TX settled on Serial1 --> RX2 and TX2 of Arduino Mega
+#define esp8266 Serial2                      //RX and TX settled on Serial1 --> RX2 and TX2 of Arduino Mega
 /*NTC parameters*/
 #define RT0 10000  // Ω
 #define VCC 5      //Operating Voltage
@@ -91,7 +92,7 @@ unsigned int TASK1 = 2000;   //gettemp
 unsigned int TASK2 = 10000;  //Log data and send them using string
 unsigned int TASK3 = 3000;
 static uint8_t displayState = 0;
-
+int pidvalue = 0;
 /* Pid command structure */
 typedef struct _pidCommand {
   String parameter;
@@ -225,10 +226,10 @@ void setup() {
   /**/
   if (shieldPresent) {
     Serial.println("SHIELD_PRESENT");
-    initializePCool();
   } else {
     Serial.println("SHIELD_NOT_PRESENT");
   }
+  initializePCool();
   Tdropstartup(shieldPresent);
 
 #ifdef __STARTUP_MESSAGE_ENABLED__
@@ -255,28 +256,39 @@ void loop() {
     receivedString = "";  // clear the string
     stringComplete = false;
   }
-
+  bool shieldPresent = digitalRead(shieldPin) == LOW;
   if (shieldPresent) {
-    // Code related to PCool module
-    for (int i = 0; i < ANALOG_CHANNELS; i++) {
-      if (heaterController[i].Compute()) {
-        analogWrite(heaterPin[i], PidOutput[i]);
-      }
-    }
-    timerPcool.tick();
+    handleShieldPresent();
   }
   // General code
   timer.tick();
+
+  if (esp8266.available() > 0) {
+    String command = esp8266.readStringUntil('\n');
+    if (command == "RestartArduino") {
+      // Restart the Arduino
+      asm volatile("  jmp 0");
+    }
+  }
+}
+
+void handleShieldPresent() {
+  for (int i = 0; i < ANALOG_CHANNELS; i++) {
+    if (heaterController[i].Compute()) {
+      analogWrite(heaterPin[i], PidOutput[i]);
+    }
+  }
+  timerPcool.tick();
 }
 
 void Tdropstartup(bool shieldPresent) {
   moduledraw(shieldPresent);
   setParametersFromESPWithProgressBar();      // Initialize ESP8266 parameters
-  Sensors_initialization();          // Initialize sensors
-  RTC_initialization();              // Initialize RTC
-  SD_initialization(shieldPresent);  // Initialize SD card
+  Sensors_initialization();                   // Initialize sensors
+  RTC_initialization();                       // Initialize RTC
+  SD_initialization(shieldPresent);           // Initialize SD card
   setWiFiParametersFromESPWithProgressBar();  // Wait and read WiFi status
-  init_screen();  // Initialize screen
+  init_screen();                              // Initialize screen
   /* Timer setup */
   /*TDrop*/
   timer.every(TASK1, datalog, &shieldPresent);
@@ -311,6 +323,7 @@ void initializePCool() {
 /* Timer Callback functions */
 
 bool SetTemperature(void *) {
+  //bool *shieldPresent = (bool *)param;
   SetTemperatureChannel(0);
   SetTemperatureChannel(3);
   temperatureCounter++;
@@ -318,6 +331,7 @@ bool SetTemperature(void *) {
 }
 
 bool SendTemperature(void *) {
+  //bool *shieldPresent = (bool *)param;
   SendTemperatureChannel(0);
   SendTemperatureChannel(3);
   temperatureCounter = 0;
@@ -326,6 +340,7 @@ bool SendTemperature(void *) {
 
 /* Current */
 bool GetCurrent(void *) {
+  //bool *shieldPresent = (bool *)param;
   GetCurrentChannel(0);
   GetCurrentChannel(3);
   currentCounter++;
@@ -333,6 +348,7 @@ bool GetCurrent(void *) {
 }
 
 bool SendCurrent(void *) {
+  //bool *shieldPresent = (bool *)param;
   SendCurrentChannel(0);
   SendCurrentChannel(3);
   currentCounter = 0;
@@ -687,9 +703,8 @@ void setParametersFromESP() {
 
   // Parse the received parameters string and set the corresponding variables
   int ntcBValue, dataTransferTime, savingTime, displayingTime;
-  char pidSetPointCharStr[16];  // Buffer to hold the PID set point as a string
-  float irrcal,sampleSurface;
-
+  //char pidSetPointCharStr[16];  // Buffer to hold the PID set point as a string
+  float irrcal, sampleSurface;
   // Extract substrings separated by '/'
   String ntcBValueStr = parametersStr.substring(0, parametersStr.indexOf('/'));
   parametersStr = parametersStr.substring(parametersStr.indexOf('/') + 1);
@@ -711,8 +726,9 @@ void setParametersFromESP() {
   savingTime = savingTimeStr.toInt();
   displayingTime = displayingTimeStr.toInt();
   irrcal = irrcalStr.toFloat();
-  strncpy(pidSetPointCharStr, pidSetPointStr.c_str(), sizeof(pidSetPointCharStr) - 1);
-  pidSetPointCharStr[sizeof(pidSetPointCharStr) - 1] = '\0';  // Ensure null-terminated string
+  pidvalue = pidSetPointStr.toInt();
+  //strncpy(pidSetPointCharStr, pidSetPointStr.c_str(), sizeof(pidSetPointCharStr) - 1);
+  //pidSetPointCharStr[sizeof(pidSetPointCharStr) - 1] = '\0';  // Ensure null-terminated string
   sampleSurface = sampleSurfaceStr.toFloat();
 
   // Set the parameters in the Arduino Mega
@@ -721,8 +737,11 @@ void setParametersFromESP() {
   TASK2 = dataTransferTime;
   TASK3 = displayingTime;
   irr_cal = irrcal;
-  PidSetpoint = pidSetPointStr.toFloat(); // Convert to float before assigning
-  SAMPLE_SURFACE = sampleSurface;
+  if (sampleSurface == 0) {
+    SAMPLE_SURFACE = Sample_Surface_Default;
+  } else {
+    SAMPLE_SURFACE = sampleSurface;
+  }
 
   // Print the parsed parameters for debugging
   Serial.print("Parsed Parameters: ");
@@ -737,7 +756,7 @@ void setParametersFromESP() {
   Serial.print(", Irradiation calibration: ");
   Serial.print(irrcal);
   Serial.print(", PID_SET_PT: ");
-  Serial.print(pidSetPointCharStr);
+  Serial.print(pidvalue);
   Serial.print(", SAM_SURFACE: ");
   Serial.println(sampleSurface, 4);  // Specify number of decimal places (e.g., 4 for 4 decimal places)
 }
@@ -758,7 +777,26 @@ bool SendDataToESP8266(void *param) {
   GenerateESPString(*shieldPresent);
   esp8266.println(str);
 #ifndef __DEBUG_ENABLED__
-  PidSetpoint = t;
+  if (pidvalue == 1) {. //Temp measured with the DHT
+    PidSetpoint = t;
+  } else if (pidvalue == 2) { //Temp measured with the DHT2
+    PidSetpoint = t2;
+  } else if (pidvalue == 3) { //Temp measured with the DHT3
+    PidSetpoint = t3;
+  } else if (pidvalue == 4) { //Temp measured with the NTC on channel 0 TS1
+    PidSetpoint = T[0];
+  } else if (pidvalue == 5) { //Temp measured with the NTC on channel 1 TS2
+    PidSetpoint = T[1];
+  } else if (pidvalue == 6) { //Temp measured with the NTC on channel 2 TS3
+    PidSetpoint = T[2];
+  } else if (pidvalue == 7) { //Temp measured with the NTC on channel 3 TS4
+    PidSetpoint = T[3];
+  } else if (pidvalue == 8) { //Temp measured with the NTC on channel 4 TBox
+    PidSetpoint = T[4];
+  } else {
+    // Default value for PidSetpoint if pidSetPointCharStr is not recognized
+    PidSetpoint = t;
+  }
 #endif
   return true;
 }
@@ -810,18 +848,11 @@ void loggingTemperature(void) {
 bool GenerateESPString(bool shieldPresent) {
   str = "";
   // Common data for both cases
-  str += String(t) + String(",") + String(h) + String(",") + String(t2) + String(",") +
-        String(h2) + String(",") + String(t3) + String(",") + String(h3) + String(",") + 
-        String(T[0]) + String(",") + String(T[1]) + String(",") + String(T[2]) + String(",") +
-        String(T[3]) + String(",") + String(T[4]) + String(",") + String(tempBoard) +
-        String(",") + String(irr) + String(",") + String(IR_temp_amb) + String(",") +
-        String(IR_temp_sky);
+  str += String(t) + String(",") + String(h) + String(",") + String(t2) + String(",") + String(h2) + String(",") + String(t3) + String(",") + String(h3) + String(",") + String(T[0]) + String(",") + String(T[1]) + String(",") + String(T[2]) + String(",") + String(T[3]) + String(",") + String(T[4]) + String(",") + String(tempBoard) + String(",") + String(irr) + String(",") + String(IR_temp_amb) + String(",") + String(IR_temp_sky);
 
   // Include PCool module specific data if shield is present
   if (shieldPresent) {
-    str += "," + String(powerDensity[0]) + "," + String(averageTemperatureValue[0]) +
-           "," + String(powerDensity[3]) + "," + String(averageTemperatureValue[3]) + "," +
-           String(PidSetpoint);
+    str += "," + String(powerDensity[0]) + "," + String(averageTemperatureValue[0]) + "," + String(powerDensity[3]) + "," + String(averageTemperatureValue[3]) + "," + String(PidSetpoint);
   }
 
   return true;
@@ -1304,6 +1335,25 @@ void Draw_powerDensity() {
   } while (u8g.nextPage());
 }
 
+void Draw_PCoolTemps() {
+  u8g.firstPage();
+  do {
+    draw();
+    u8g.setFont(u8g_font_8x13);
+    u8g.setPrintPos(3, 30);
+    u8g.print("PCool Temps");
+    u8g.setPrintPos(5, 40);
+    u8g.print(averageTemperatureValue[0], 2);
+    u8g.setPrintPos(65, 40);
+    u8g.print("C");
+    u8g.setPrintPos(10, 60);
+    u8g.print(averageTemperatureValue[3], 2);
+    u8g.setPrintPos(75, 60);
+    u8g.print("C");
+    u8g.drawBitmapP(90, 35, 4, 32, Therm_icon);
+  } while (u8g.nextPage());
+}
+
 void moduledraw(bool shieldPresent) {
   if (shieldPresent) {
     u8g.firstPage();
@@ -1437,6 +1487,12 @@ bool displaying_data(void *param) {
         Draw_powerDensity();
       }
       break;
+    case 10:
+      // Display power density only if PCool module is loaded
+      if (*shieldPresent) {
+        Draw_PCoolTemps();
+      }
+      break;
     default:
       // Handle unknown state
       break;
@@ -1448,7 +1504,7 @@ bool displaying_data(void *param) {
     displayState++;
 
     // Reset state to the initial state if we've reached the end
-    if (displayState >= 10) {
+    if (displayState >= 11) {
       displayState = 0;
     }
   }
@@ -1456,4 +1512,3 @@ bool displaying_data(void *param) {
   //Serial.println(displayState);
   return true;
 }
-
