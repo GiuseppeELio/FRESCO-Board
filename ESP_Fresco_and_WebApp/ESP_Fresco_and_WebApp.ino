@@ -1,6 +1,7 @@
 //#include "secrets.h"
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
+#include "wpa2_enterprise.h"
 #define DEVICE "ESP8266"
 #include <InfluxDbClient.h>
 #include <InfluxDbCloud.h>
@@ -44,6 +45,9 @@ const char* PARAM_INPUT_14 = "displaying_time";
 const char* PARAM_INPUT_15 = "irr_cal";
 const char* PARAM_INPUT_16 = "pid_set_point";
 const char* PARAM_INPUT_17 = "sample_surface";
+const char* PARAM_INPUT_18 = "academicSsid";
+const char* PARAM_INPUT_19 = "academicUser";
+const char* PARAM_INPUT_20 = "academicPass";
 
 bool useCloudInfluxDB = false;
 /* SSID and PASSWORD for the Acces Point*/
@@ -67,6 +71,9 @@ String displaying_time;
 String irr_cal;
 String pid_set_point;
 String sample_surface;
+String academicSsid;
+String academicUser;
+String academicPass;
 
 // File paths to save input values permanently
 const char* ssidPath = "/ssid.txt";
@@ -86,6 +93,10 @@ const char* displaying_time_Path = "/displaying_time.txt";
 const char* irr_cal_Path = "/irr_cal.txt";
 const char* pid_set_point_Path = "/pid_set_point.txt";
 const char* sample_surface_Path = "/sample_surface.txt";
+
+const char* academicSsid_Path = "/academicSsid.txt";
+const char* academicUser_Path = "/academicUser.txt";
+const char* academicPass_Path = "/academicPass.txt";
 
 boolean restart = false;
 bool sensorState = false; // Global variable to hold the sensor state
@@ -152,25 +163,48 @@ InfluxDBClient client;
 Point sensor("Measurements");
 
 // Initialize WiFi
-bool initWiFi() {
+bool initWiFi() {  
+  if (!academicUser.isEmpty() && !academicPass.isEmpty()) {
+    // Connect to the WiFi network
+    wifi_set_opmode(STATION_MODE);
+    struct station_config wifi_config;
+    memset(&wifi_config, 0, sizeof(wifi_config));
+    //strcpy((char *)wifi_config.ssid, ssid);
+    strcpy((char *)wifi_config.ssid, academicSsid.c_str());
+    wifi_station_set_config(&wifi_config);
+    // DISABLE authentication using certificates - But risk leaking your password to someone claiming to be "eduroam"
+    wifi_station_clear_cert_key();
+    wifi_station_clear_enterprise_ca_cert();
+    // Authenticate using username/password
+    wifi_station_set_wpa2_enterprise_auth(1);
+    wifi_station_set_enterprise_identity((uint8 *)academicUser.c_str(), strlen(academicUser.c_str()));
+    wifi_station_set_enterprise_username((uint8 *)academicUser.c_str(), strlen(academicUser.c_str()));
+    wifi_station_set_enterprise_password((uint8 *)academicPass.c_str(), strlen(academicPass.c_str()));
+
+    wifi_station_connect();
+    int attempts = 0;
+    while (WiFi.status() != WL_CONNECTED && attempts < 20) {
+      delay(500);
+      //Serial.print(".");
+      attempts++;
+    }
+  } else {
+    WiFi.begin(ssid.c_str(), pass.c_str());
+
+    //Serial.println("Connecting to WiFi...");
+
+    // Wait for the WiFi connection
+    int attempts = 0;
+    while (WiFi.status() != WL_CONNECTED && attempts < 20) {
+      delay(500);
+      //Serial.print(".");
+      attempts++;
+    }
+  }
   WiFi.mode(WIFI_STA);
   WiFi.softAP(ssid1, password1);
-
   // Wait for the softAP to start
   delay(1000);
-
-  // Connect to the WiFi network
-  WiFi.begin(ssid.c_str(), pass.c_str());
-
-  //Serial.println("Connecting to WiFi...");
-
-  // Wait for the WiFi connection
-  int attempts = 0;
-  while (WiFi.status() != WL_CONNECTED && attempts < 20) {
-    delay(500);
-    //Serial.print(".");
-    attempts++;
-  }
   //WiFi.setAutoReconnect(true);
   //WiFi.persistent(true);
 
@@ -211,6 +245,10 @@ void setup() {
   irr_cal = readFile(LittleFS, irr_cal_Path);
   pid_set_point = readFile(LittleFS, pid_set_point_Path);
   sample_surface = readFile(LittleFS, sample_surface_Path);
+
+  academicSsid = readFile(LittleFS, academicSsid_Path);
+  academicUser = readFile(LittleFS, academicUser_Path);
+  academicPass = readFile(LittleFS, academicPass_Path);
 
   //  Serial.println(ssid);
   //  Serial.println(pass);
@@ -354,75 +392,75 @@ void loop() {
     ESP.restart();
   }
   if (Serial.available() > 0) {
-        // Read the data from serial port
-        String receivedData = Serial.readStringUntil('\n');
-        // Process the received data
-        processReceivedData(receivedData);
-    }
+    // Read the data from serial port
+    String receivedData = Serial.readStringUntil('\n');
+    // Process the received data
+    processReceivedData(receivedData);
+  }
 }
 
 void processReceivedData(const String& data) {
-    // Parse the received data and split it into elements
-    int count = 0;
-    int startIndex = 0;
-    for (int i = 0; i <= data.length(); ++i) {  // Include the end of string
-        if (i == data.length() || data[i] == ' ' || data[i] == ',' || data[i] == '\n') {
-            array[count++] = data.substring(startIndex, i);
-            startIndex = i + 1;
-        }
+  // Parse the received data and split it into elements
+  int count = 0;
+  int startIndex = 0;
+  for (int i = 0; i <= data.length(); ++i) {  // Include the end of string
+    if (i == data.length() || data[i] == ' ' || data[i] == ',' || data[i] == '\n') {
+      array[count++] = data.substring(startIndex, i);
+      startIndex = i + 1;
     }
+  }
 
-    // Process the received data based on its length
-    if (count <= 15) {
-        // TDrop data
-        isPCool = false;
-        //Serial.println("Received TDrop data:");
-    } else {
-        // PCool data
-        //Serial.println("Received PCool data:");
-        isPCool = true;
-    }
-    server.on("/status", HTTP_GET, handleStatus);
-    printArray(array, count);
+  // Process the received data based on its length
+  if (count <= 15) {
+    // TDrop data
+    isPCool = false;
+    //Serial.println("Received TDrop data:");
+  } else {
+    // PCool data
+    //Serial.println("Received PCool data:");
+    isPCool = true;
+  }
+  server.on("/status", HTTP_GET, handleStatus);
+  printArray(array, count);
 
-    // Populate sensor fields
-    sensor.clearFields();  // Clear old data in fields
-    for (int i = 0; i < count; ++i) {
-        String fieldName = "Temp_amb";
-        if (i == 1) fieldName = "Humidity";
-        else if (i==2) fieldName = "Temp_amb 2";
-        else if (i==3) fieldName = "Humidity 2";
-        else if (i==4) fieldName = "Temp_amb 3";
-        else if (i==5) fieldName = "Humidity 3";
-        else if (i==6) fieldName = "Temp_S1";
-        else if (i==7) fieldName = "Temp_S2";
-        else if (i==8) fieldName = "Temp_S3";
-        else if (i==9) fieldName = "Temp_S4";
-        else if (i == 10) fieldName = "Temp_Box";
-        else if (i == 11) fieldName = "Temp_Board";
-        else if (i == 12) fieldName = "Irradiance";
-        else if (i == 13) fieldName = "IR Amb";
-        else if (i == 14) fieldName = "IR Sky";
-        else if (i == 15) fieldName = "PD1";
-        else if (i == 16) fieldName = "TPC1";
-        else if (i == 17) fieldName = "PD2";
-        else if (i == 18) fieldName = "TPC2";
-        else if (i == 19) fieldName = "SetP";
+  // Populate sensor fields
+  sensor.clearFields();  // Clear old data in fields
+  for (int i = 0; i < count; ++i) {
+    String fieldName = "Temp_amb";
+    if (i == 1) fieldName = "Humidity";
+    else if (i == 2) fieldName = "Temp_amb 2";
+    else if (i == 3) fieldName = "Humidity 2";
+    else if (i == 4) fieldName = "Temp_amb 3";
+    else if (i == 5) fieldName = "Humidity 3";
+    else if (i == 6) fieldName = "Temp_S1";
+    else if (i == 7) fieldName = "Temp_S2";
+    else if (i == 8) fieldName = "Temp_S3";
+    else if (i == 9) fieldName = "Temp_S4";
+    else if (i == 10) fieldName = "Temp_Box";
+    else if (i == 11) fieldName = "Temp_Board";
+    else if (i == 12) fieldName = "Irradiance";
+    else if (i == 13) fieldName = "IR Amb";
+    else if (i == 14) fieldName = "IR Sky";
+    else if (i == 15) fieldName = "PD1";
+    else if (i == 16) fieldName = "TPC1";
+    else if (i == 17) fieldName = "PD2";
+    else if (i == 18) fieldName = "TPC2";
+    else if (i == 19) fieldName = "SetP";
 
-        sensor.addField(fieldName, array[i].toFloat());
-    }
+    sensor.addField(fieldName, array[i].toFloat());
+  }
 
-    // Push data to InfluxDB
-    client.writePoint(sensor);
+  // Push data to InfluxDB
+  client.writePoint(sensor);
 
-    // Send events
-    events.send("ping", NULL, millis());
-    events.send(getSensorReadings().c_str(), "new_readings", millis());
-    events2.send(getSensorReadings2().c_str(), "new_readings2", millis());
-    if (isPCool){
+  // Send events
+  events.send("ping", NULL, millis());
+  events.send(getSensorReadings().c_str(), "new_readings", millis());
+  events2.send(getSensorReadings2().c_str(), "new_readings2", millis());
+  if (isPCool) {
     events3.send(getSensorReadings3().c_str(), "new_readings3", millis());
     events4.send(getSensorReadings4().c_str(), "new_readings4", millis());
-    }
+  }
 }
 
 void printArray(String arr[], int size) {
@@ -494,10 +532,29 @@ void handleWiFiConfiguration(AsyncWebServerRequest * request) {
         Serial.println(pass);
         writeFile(LittleFS, passPath, pass.c_str());
       }
+      if (p->name() == PARAM_INPUT_18) {
+        academicSsid = p->value().c_str();
+        Serial.print("Aca SSDI set to: ");
+        Serial.println(academicSsid);
+        writeFile(LittleFS, academicSsid_Path, academicSsid.c_str());
+      }
+      if (p->name() == PARAM_INPUT_19) {
+        academicUser = p->value().c_str();
+        Serial.print("Aca Username set to: ");
+        Serial.println(academicUser);
+        writeFile(LittleFS, academicUser_Path, academicUser.c_str());
+      }
+      if (p->name() == PARAM_INPUT_20) {
+        academicPass = p->value().c_str();
+        Serial.print("Aca Password set to: ");
+        Serial.println(academicPass);
+        writeFile(LittleFS, academicPass_Path, academicPass.c_str());
+      }
     }
   }
   restart = true;
-  request->send(200, "text/plain", "Done. ESP will restart, connect to your ssid: " + ssid);
+  request->send(200, "text/plain", "Done. ESP will restart, connect to your ssid: " + ssid + "or accademic" + academicSsid);
+  Serial.println("RestartArduino");
 }
 
 void handleInfluxDBConfiguration(AsyncWebServerRequest * request) {
@@ -539,6 +596,7 @@ void handleInfluxDBConfiguration(AsyncWebServerRequest * request) {
   }
   restart = true;
   request->send(200, "text/plain", "Done. ESP will restart, connect to INFLUXDB_URL: " + INFLUXDB_URL);
+  Serial.println("RestartArduino");
 }
 
 // Handle settings configuration
@@ -621,6 +679,7 @@ void handleSettingsConfiguration(AsyncWebServerRequest * request) {
   }
   restart = true;
   request->send(200, "text/plain", "Done. ESP will restart.");
+  Serial.println("RestartArduino");
 }
 
 void handleStatus(AsyncWebServerRequest * request) {
