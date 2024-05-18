@@ -374,11 +374,11 @@ float ReadTemperatureChannel(unsigned char channel) {
 
   temperature = temperature / 10000;   // (R/Ro)
   temperature = log(temperature);      // ln(R/Ro)
-  temperature /= 3380;                 // 1/B * ln(R/Ro)
+  temperature /= B;                 // 1/B * ln(R/Ro)
   temperature += 1.0 / (25 + 273.15);  // + (1/To)
   temperature = 1.0 / temperature;     // Invert
   temperature -= 273.15;               // convert absolute temp to C
-  if (temperature > 80 || temperature < -10) temperature = -273.15;
+  if (temperature > 80 || temperature < -30) temperature = -273.15;
   return temperature;
 }
 
