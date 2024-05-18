@@ -48,6 +48,7 @@ const char* PARAM_INPUT_17 = "sample_surface";
 const char* PARAM_INPUT_18 = "academicSsid";
 const char* PARAM_INPUT_19 = "academicUser";
 const char* PARAM_INPUT_20 = "academicPass";
+const char* PARAM_INPUT_21 = "newsetpoint";
 
 bool useCloudInfluxDB = false;
 /* SSID and PASSWORD for the Acces Point*/
@@ -74,6 +75,7 @@ String sample_surface;
 String academicSsid;
 String academicUser;
 String academicPass;
+String newsetpoint; 
 
 // File paths to save input values permanently
 const char* ssidPath = "/ssid.txt";
@@ -93,7 +95,7 @@ const char* displaying_time_Path = "/displaying_time.txt";
 const char* irr_cal_Path = "/irr_cal.txt";
 const char* pid_set_point_Path = "/pid_set_point.txt";
 const char* sample_surface_Path = "/sample_surface.txt";
-
+const char* newsetpoint_Path = "/newsetpoint.txt";
 const char* academicSsid_Path = "/academicSsid.txt";
 const char* academicUser_Path = "/academicUser.txt";
 const char* academicPass_Path = "/academicPass.txt";
@@ -245,7 +247,7 @@ void setup() {
   irr_cal = readFile(LittleFS, irr_cal_Path);
   pid_set_point = readFile(LittleFS, pid_set_point_Path);
   sample_surface = readFile(LittleFS, sample_surface_Path);
-
+  newsetpoint = readFile(LittleFS, newsetpoint_Path);
   academicSsid = readFile(LittleFS, academicSsid_Path);
   academicUser = readFile(LittleFS, academicUser_Path);
   academicPass = readFile(LittleFS, academicPass_Path);
@@ -260,7 +262,7 @@ void setup() {
   //  Serial.println(NTP_server);
   //  Serial.println(TZ_INFO);
   //  Serial.println(ArrayLength);
-  String paramString = ntc_b_value + "/" + data_transfer_time + "/" + saving_time + "/" + displaying_time + "/" + irr_cal + "/" + pid_set_point + "/" + sample_surface + "\n";
+  String paramString = ntc_b_value + "/" + data_transfer_time + "/" + saving_time + "/" + displaying_time + "/" + irr_cal + "/" + pid_set_point + "/" + sample_surface + "/" + newsetpoint + "\n";
   // Send the string to Arduino
   Serial.print(paramString);
   //configTime(TZ_INFO, MY_NTP_SERVER);
@@ -674,6 +676,13 @@ void handleSettingsConfiguration(AsyncWebServerRequest * request) {
         Serial.println(sample_surface);
         // Update LittleFS file
         writeFile(LittleFS, sample_surface_Path, sample_surface.c_str());
+      }
+      if (p->name() == PARAM_INPUT_21) {
+        newsetpoint = p->value().c_str();
+        Serial.print("newsetpoint set to: ");
+        Serial.println(newsetpoint);
+        // Update LittleFS file
+        writeFile(LittleFS, newsetpoint_Path, newsetpoint.c_str());
       }
     }
   }
