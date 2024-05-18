@@ -83,12 +83,16 @@ float SAMPLE_SURFACE;
 #define VCC 5      //Operating Voltage
 #define R 10000    //R=10KΩ Pull Up resistor
 #define T0 298.15
-#define B_default = 3380;  //  B NTC default
-int B = 3380;  //  K NTC part number NXFT15XH103FA2B100 or 3455
+#define B_default 3380  //  B NTC default
+int B = 3380;              //  K NTC part number NXFT15XH103FA2B100 or 3455
+#define irrcal_default 3.4
 /*Task times */
 //#define RESET_TIME 14400000 //time for reset function every 4 hours in milliseconds -- 7200000 (2 hours)
 //unsigned long ResetTime = RESET_TIME;
 //#define TASK1 3000                  //gettemp
+#define TASK1_default 1000
+#define TASK2_default 5000
+#define TASK3_default 3000
 unsigned int TASK1 = 2000;   //gettemp
 unsigned int TASK2 = 10000;  //Log data and send them using string
 unsigned int TASK3 = 3000;
@@ -165,7 +169,7 @@ U8GLIB_SSD1306_128X64 u8g(U8G_I2C_OPT_NONE | U8G_I2C_OPT_DEV_0);  // I2C / TWI
 
 float tempBoard = 0;  //The sensor used to measure the temp. on Board
 float t, h, t2, h2, t3, h3, irr, IR_temp_amb, IR_temp_sky = 0;
-int irr_cal = 2.2;
+int irr_cal = 3.4;
 /**/
 String str;
 String str0;
