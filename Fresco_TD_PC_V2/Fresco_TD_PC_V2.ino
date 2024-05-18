@@ -83,6 +83,7 @@ float SAMPLE_SURFACE;
 #define VCC 5      //Operating Voltage
 #define R 10000    //R=10KΩ Pull Up resistor
 #define T0 298.15
+#define B_default = 3380;  //  B NTC default
 int B = 3380;  //  K NTC part number NXFT15XH103FA2B100 or 3455
 /*Task times */
 //#define RESET_TIME 14400000 //time for reset function every 4 hours in milliseconds -- 7200000 (2 hours)
@@ -732,13 +733,33 @@ void setParametersFromESP() {
   sampleSurface = sampleSurfaceStr.toFloat();
 
   // Set the parameters in the Arduino Mega
-  B = ntcBValue;
-  TASK1 = savingTime;
-  TASK2 = dataTransferTime;
-  TASK3 = displayingTime;
-  irr_cal = irrcal;
+  if (ntcBValue == 0) {
+    B = B_default;  //  B NTC default
+  } else {
+    B = ntcBValue;
+  }
+  if (savingTime == 0 || dataTransferTime < 1000) {
+    TASK1 = TASK1_default;  //  Saving time setted to default
+  } else {
+    TASK1 = savingTime;
+  }
+  if (dataTransferTime == 0 || dataTransferTime < 5000) {
+    TASK2 = TASK2_default;  // transfer time to ESP setted to default
+  } else {
+    TASK2 = savingDataTransferTime;
+  }
+  if (displayingTime == 0 || displayingTime < 3000) {
+    TASK3 = TASK3_default;  // Displaying time setted to default
+  } else {
+    TASK3 = savingDataTransferTime;
+  }
+  if (irrcal == 0) {
+    irr_cal = irrcal_dafault;  // Irradiance setted to default
+  } else {
+    irr_cal = irrcal;
+  }
   if (sampleSurface == 0) {
-    SAMPLE_SURFACE = Sample_Surface_Default;
+    SAMPLE_SURFACE = Sample_Surface_Default; //Sample surface setted to default
   } else {
     SAMPLE_SURFACE = sampleSurface;
   }
