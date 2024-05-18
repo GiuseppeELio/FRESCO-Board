@@ -742,7 +742,7 @@ void setParametersFromESP() {
   } else {
     B = ntcBValue;
   }
-  if (savingTime == 0 || dataTransferTime < 1000) {
+  if (savingTime == 0 || savingTime < 1000) {
     TASK1 = TASK1_default;  //  Saving time setted to default
   } else {
     TASK1 = savingTime;
@@ -750,15 +750,15 @@ void setParametersFromESP() {
   if (dataTransferTime == 0 || dataTransferTime < 5000) {
     TASK2 = TASK2_default;  // transfer time to ESP setted to default
   } else {
-    TASK2 = savingDataTransferTime;
+    TASK2 = dataTransferTime;
   }
   if (displayingTime == 0 || displayingTime < 3000) {
     TASK3 = TASK3_default;  // Displaying time setted to default
   } else {
-    TASK3 = savingDataTransferTime;
+    TASK3 = displayingTime;
   }
   if (irrcal == 0) {
-    irr_cal = irrcal_dafault;  // Irradiance setted to default
+    irr_cal = irrcal_default;  // Irradiance setted to default
   } else {
     irr_cal = irrcal;
   }
