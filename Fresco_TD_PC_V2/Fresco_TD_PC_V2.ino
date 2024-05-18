@@ -1366,19 +1366,40 @@ void Draw_powerDensity() {
 void Draw_PCoolTemps() {
   u8g.firstPage();
   do {
-    draw();
+    //draw();
     u8g.setFont(u8g_font_8x13);
-    u8g.setPrintPos(3, 30);
+
+    // Title
+    u8g.setPrintPos(3, 15);
     u8g.print("PCool Temps");
-    u8g.setPrintPos(5, 40);
+
+    // First Temperature Value
+		u8g.setPrintPos(5, 30);
+    u8g.print("TPC1");
+    u8g.setPrintPos(50, 30);
     u8g.print(averageTemperatureValue[0], 2);
-    u8g.setPrintPos(65, 40);
+    u8g.setPrintPos(95, 30);
     u8g.print("C");
-    u8g.setPrintPos(10, 60);
+
+    // Second Temperature Value
+		u8g.setPrintPos(5, 45);
+    u8g.print("TPC2");
+    u8g.setPrintPos(50, 45);
     u8g.print(averageTemperatureValue[3], 2);
-    u8g.setPrintPos(75, 60);
+    u8g.setPrintPos(95, 45);
     u8g.print("C");
-    u8g.drawBitmapP(90, 35, 4, 32, Therm_icon);
+
+    // Third Temperature Value
+		u8g.setPrintPos(5, 60);
+    u8g.print("TsetP");
+    u8g.setPrintPos(50, 60);
+    u8g.print(PidSetpoint, 2);
+    u8g.setPrintPos(95, 60);
+    u8g.print("C");
+
+    // Thermometer Icon
+    u8g.drawBitmapP(100, 30, 4, 32, Therm_icon);
+
   } while (u8g.nextPage());
 }
 
