@@ -802,26 +802,29 @@ bool SendDataToESP8266(void *param) {
   GenerateESPString(*shieldPresent);
   esp8266.println(str);
 #ifndef __DEBUG_ENABLED__
-  if (pidvalue == 1) {. //Temp measured with the DHT
+if (pidvalue == 0 || pidvalue == 1) {  // Temp measured with the DHT (case 0 or 1)
     PidSetpoint = t;
-  } else if (pidvalue == 2) { //Temp measured with the DHT2
+} else if (pidvalue == 2) {  // Temp measured with the DHT2
     PidSetpoint = t2;
-  } else if (pidvalue == 3) { //Temp measured with the DHT3
+} else if (pidvalue == 3) {  // Temp measured with the DHT3
     PidSetpoint = t3;
-  } else if (pidvalue == 4) { //Temp measured with the NTC on channel 0 TS1
+} else if (pidvalue == 4) {  // Temp measured with the NTC on channel 0 TS1
     PidSetpoint = T[0];
-  } else if (pidvalue == 5) { //Temp measured with the NTC on channel 1 TS2
+} else if (pidvalue == 5) {  // Temp measured with the NTC on channel 1 TS2
     PidSetpoint = T[1];
-  } else if (pidvalue == 6) { //Temp measured with the NTC on channel 2 TS3
+} else if (pidvalue == 6) {  // Temp measured with the NTC on channel 2 TS3
     PidSetpoint = T[2];
-  } else if (pidvalue == 7) { //Temp measured with the NTC on channel 3 TS4
+} else if (pidvalue == 7) {  // Temp measured with the NTC on channel 3 TS4
     PidSetpoint = T[3];
-  } else if (pidvalue == 8) { //Temp measured with the NTC on channel 4 TBox
+} else if (pidvalue == 8) {  // Temp measured with the NTC on channel 4 TBox
     PidSetpoint = T[4];
-  } else {
-    // Default value for PidSetpoint if pidSetPointCharStr is not recognized
-    PidSetpoint = t;
-  }
+} else if (pidvalue < 0 || pidvalue > 100) {
+    PidSetpoint = t;  // Default value for negative or out-of-range values
+} else if (pidvalue >= 10 && pidvalue <= 99) {
+    PidSetpoint = static_cast<int>(round(pidvalue));  // Set PidSetpoint to rounded pidvalue
+} else {
+    PidSetpoint = t;  // Default value for any other value not specifically handled
+}
 #endif
   return true;
 }
