@@ -391,7 +391,7 @@ bool SendTemperatureChannel(unsigned char channel) {
 
   temperature = temperatureValue[channel] / 10000;  // (R/Ro)
   temperature = log(temperature);                   // ln(R/Ro)
-  temperature /= 3380;                              // 1/B * ln(R/Ro)
+  temperature /= B;                              // 1/B * ln(R/Ro)
   temperature += 1.0 / (25 + 273.15);               // + (1/To)
   temperature = 1.0 / temperature;                  // Invert
   temperature -= 273.15;                            // convert absolute temp to C
