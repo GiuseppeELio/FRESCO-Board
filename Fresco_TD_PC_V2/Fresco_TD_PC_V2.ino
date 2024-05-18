@@ -77,7 +77,7 @@ float SAMPLE_SURFACE;
 #define DHTPIN3 15
 #define ONE_WIRE_BUS2 8 /* Sensor on board*/ /*Remember to not put it in the parallel line of the sensors that go in the external box*/
 #define DHTTYPE DHT22                        // DHT 22  (AM2302)
-#define esp8266 Serial1                      //RX and TX settled on Serial1 --> RX2 and TX2 of Arduino Mega
+#define esp8266 Serial2                      //RX and TX settled on Serial1 --> RX2 and TX2 of Arduino Mega
 /*NTC parameters*/
 #define RT0 10000  // Ω
 #define VCC 5      //Operating Voltage
@@ -98,6 +98,7 @@ unsigned int TASK2 = 10000;  //Log data and send them using string
 unsigned int TASK3 = 3000;
 static uint8_t displayState = 0;
 int pidvalue = 0;
+double newsetpoint = 0;
 /* Pid command structure */
 typedef struct _pidCommand {
   String parameter;
@@ -710,6 +711,7 @@ void setParametersFromESP() {
   int ntcBValue, dataTransferTime, savingTime, displayingTime;
   //char pidSetPointCharStr[16];  // Buffer to hold the PID set point as a string
   float irrcal, sampleSurface;
+  double NewSetPointTemp;
   // Extract substrings separated by '/'
   String ntcBValueStr = parametersStr.substring(0, parametersStr.indexOf('/'));
   parametersStr = parametersStr.substring(parametersStr.indexOf('/') + 1);
@@ -723,6 +725,8 @@ void setParametersFromESP() {
   parametersStr = parametersStr.substring(parametersStr.indexOf('/') + 1);
   String pidSetPointStr = parametersStr.substring(0, parametersStr.indexOf('/'));
   parametersStr = parametersStr.substring(parametersStr.indexOf('/') + 1);
+  String newSetPointStr = parametersStr;
+  parametersStr = parametersStr.substring(parametersStr.indexOf('/') + 1);
   String sampleSurfaceStr = parametersStr;
 
   // Convert the substrings to numerical values
@@ -734,6 +738,7 @@ void setParametersFromESP() {
   pidvalue = pidSetPointStr.toInt();
   //strncpy(pidSetPointCharStr, pidSetPointStr.c_str(), sizeof(pidSetPointCharStr) - 1);
   //pidSetPointCharStr[sizeof(pidSetPointCharStr) - 1] = '\0';  // Ensure null-terminated string
+  NewSetPointTemp = newSetPointStr.toDouble();
   sampleSurface = sampleSurfaceStr.toFloat();
 
   // Set the parameters in the Arduino Mega
@@ -767,6 +772,7 @@ void setParametersFromESP() {
   } else {
     SAMPLE_SURFACE = sampleSurface;
   }
+  newsetpoint = NewSetPointTemp;
 
   // Print the parsed parameters for debugging
   Serial.print("Parsed Parameters: ");
@@ -782,6 +788,8 @@ void setParametersFromESP() {
   Serial.print(irrcal);
   Serial.print(", PID_SET_PT: ");
   Serial.print(pidvalue);
+  Serial.print(", New_SET_PT_Temp: ");
+  Serial.print(newsetpoint,2);
   Serial.print(", SAM_SURFACE: ");
   Serial.println(sampleSurface, 4);  // Specify number of decimal places (e.g., 4 for 4 decimal places)
 }
@@ -802,7 +810,7 @@ bool SendDataToESP8266(void *param) {
   GenerateESPString(*shieldPresent);
   esp8266.println(str);
 #ifndef __DEBUG_ENABLED__
-if (pidvalue == 0 || pidvalue == 1) {  // Temp measured with the DHT (case 0 or 1)
+  if (pidvalue == 0 || pidvalue == 1) {  // Temp measured with the DHT
     PidSetpoint = t;
 } else if (pidvalue == 2) {  // Temp measured with the DHT2
     PidSetpoint = t2;
@@ -818,10 +826,14 @@ if (pidvalue == 0 || pidvalue == 1) {  // Temp measured with the DHT (case 0 or 
     PidSetpoint = T[3];
 } else if (pidvalue == 8) {  // Temp measured with the NTC on channel 4 TBox
     PidSetpoint = T[4];
-} else if (pidvalue < 0 || pidvalue > 100) {
-    PidSetpoint = t;  // Default value for negative or out-of-range values
-} else if (pidvalue >= 10 && pidvalue <= 99) {
-    PidSetpoint = static_cast<int>(round(pidvalue));  // Set PidSetpoint to rounded pidvalue
+} else if (pidvalue == 10) {  
+    // Allow user to set PidSetpoint via newsetpoint with constraints
+    if (newsetpoint > 0 && newsetpoint <= 60) {
+        PidSetpoint = newsetpoint;
+    } else {
+        // Default value if newsetpoint is out of range
+        PidSetpoint = t;
+    }
 } else {
     PidSetpoint = t;  // Default value for any other value not specifically handled
 }
