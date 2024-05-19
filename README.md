@@ -2,7 +2,7 @@
 ![alt text](doc/img/Fresco_Logo_3.png)
 ## Introduction and scope 
 
-The code reported in this repository are related to a data logger realization able to measure the temperature drop and the cooling power of "passive radiative cooling" samples. The device is covered by the OSHWA certificate with the UID IT0000015 and the details are available at the [following link](https://certification.oshwa.org/it000015.html) 
+The code reported in this repository are related to a data logger realization able to measure the temperature drop and the cooling power of "passive radiative cooling" samples. The device is covered by the OSHWA certificate and the GPL license with the UID IT0000015 and the details are available at the [following link](https://certification.oshwa.org/it000015.html) 
 <p align="right">
   <img src="doc/img/certification-mark-IT000015-wide.png" />
 </p>
@@ -10,6 +10,11 @@ The code reported in this repository are related to a data logger realization ab
 ![alt text](doc/img/new_boxe_v35.png)
 
 The board as shown in the figure is composed by a main board, a TDrop shield that allows measuring the temperature for multiple samples, the solar irradiance, the sky temperature using an IR sensor, ambient temperature and relative humidity using a DHT22, store data on a onboard SD card. It is also equipped with a RTC clock for the correct time and a ESP8266-12F module for the WiFi connection and communication. The PCool shield is equipped with NTC to measure the sample temperature and a PID system to warm-up them to the setting point temperature that usually is the ambient temperature. 
+
+## A supporter is worth a thousand followers.
+
+Dear reader, if you are interested in the development of FRESCO and its improvement with new features, please support our team by using the support button or by going directly to 
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://buymeacoffee.com/gpplio93sx). We are actively working to do our best to achieve a reliable passive radiative cooling measurement apparatus. With your support we will move forward in developing new features, improve the web application experience and make it more essential for your experiments. You can support us directly buying coffees, with a membership and sooner directly buying the FRESCO boards. 
 
 ##       Software details
 
