@@ -788,10 +788,10 @@ void setParametersFromESP() {
   Serial.print(irrcal);
   Serial.print(", PID_SET_PT: ");
   Serial.print(pidvalue);
-  Serial.print(", New_SET_PT_Temp: ");
-  Serial.print(newsetpoint,2);
   Serial.print(", SAM_SURFACE: ");
   Serial.println(sampleSurface, 4);  // Specify number of decimal places (e.g., 4 for 4 decimal places)
+  Serial.print(", New_SET_PT_Temp: ");
+  Serial.print(newsetpoint,2);
 }
 
 void Sensors_initialization() {
