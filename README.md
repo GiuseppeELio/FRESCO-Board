@@ -40,6 +40,9 @@ Using the provided Jupyter Notebook [FRESCO_Tdrop_PCool_analysis.ipynb](https://
 
 ## Grafana Dashboard
 
-An example of the dashboard displaying the usefull data is reported below
+Here it is reported an example of the full FRESCO dashboard realized using Grafana and it is displaying the temperature for each sensor (DHTs, NTCs, IR) the solar irradiance, the temperature drop in chart and gauges and also the cooling power is reported using charts (power and the setting point temperature) and gauges. You can find at the following link the JSON file to make your dashboard as this one or to customize it.  
 
-%%% Work in progress%%% The dashboard Json code will be released soon. 
+<p align="right">
+  <img src="doc/img/FRESCO_Grafana_dashboard.png" />
+</p>
+
