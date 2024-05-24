@@ -77,21 +77,21 @@ float SAMPLE_SURFACE;
 #define DHTPIN3 15
 #define ONE_WIRE_BUS2 8 /* Sensor on board*/ /*Remember to not put it in the parallel line of the sensors that go in the external box*/
 #define DHTTYPE DHT22                        // DHT 22  (AM2302)
-#define esp8266 Serial2                      //RX and TX settled on Serial1 --> RX2 and TX2 of Arduino Mega
+#define esp8266 Serial1                      //RX and TX settled on Serial1 --> RX2 and TX2 of Arduino Mega
 /*NTC parameters*/
 #define RT0 10000  // Ω
 #define VCC 5      //Operating Voltage
 #define R 10000    //R=10KΩ Pull Up resistor
 #define T0 298.15
 #define B_default 3380  //  B NTC default
-int B = 3380;              //  K NTC part number NXFT15XH103FA2B100 or 3455
+int B = 3380;           //  K NTC part number NXFT15XH103FA2B100 or 3455
 #define irrcal_default 3.4
 /*Task times */
 //#define RESET_TIME 14400000 //time for reset function every 4 hours in milliseconds -- 7200000 (2 hours)
 //unsigned long ResetTime = RESET_TIME;
 //#define TASK1 3000                  //gettemp
-#define TASK1_default 1000
-#define TASK2_default 5000
+#define TASK1_default 2000
+#define TASK2_default 10000
 #define TASK3_default 3000
 unsigned int TASK1 = 2000;   //gettemp
 unsigned int TASK2 = 10000;  //Log data and send them using string
@@ -152,20 +152,18 @@ const uint8_t currentSensingPin[ANALOG_CHANNELS] = { PIN_CURR0, PIN_CURR1, PIN_C
 const uint8_t temperatureSensingPin[ANALOG_CHANNELS] = { PIN_NTC0, PIN_NTC1, PIN_NTC2, PIN_NTC3 };
 const uint8_t heaterPin[ANALOG_CHANNELS] = { PIN_PWM0, PIN_PWM1, PIN_PWM2, PIN_PWM3 };
 
-
+/*Timer definition*/
+Timer<4> timer;                                                   // create a timer with N tasks and microsecond resolution
 Timer<4, micros> timerPcool;  // create a timer with 1 task and microsecond resolution
 
 String receivedString = "";   // a String to hold incoming data
 bool stringComplete = false;  // whether the string is complete
-
 
 /* Function prototypes */
 bool GetTemperature(void *);
 bool GetCurrent(void *);
 bool SendResults(void *);
 
-/*Timer definition*/
-Timer<4> timer;                                                   // create a timer with N tasks and microsecond resolution
 U8GLIB_SSD1306_128X64 u8g(U8G_I2C_OPT_NONE | U8G_I2C_OPT_DEV_0);  // I2C / TWI
 
 float tempBoard = 0;  //The sensor used to measure the temp. on Board
@@ -232,11 +230,12 @@ void setup() {
   /**/
   if (shieldPresent) {
     Serial.println("SHIELD_PRESENT");
+    initializePCool();
+    Tdropstartup(shieldPresent);
   } else {
     Serial.println("SHIELD_NOT_PRESENT");
+    Tdropstartup(shieldPresent);
   }
-  initializePCool();
-  Tdropstartup(shieldPresent);
 
 #ifdef __STARTUP_MESSAGE_ENABLED__
   Serial.print("PCool");
@@ -264,10 +263,12 @@ void loop() {
   }
   bool shieldPresent = digitalRead(shieldPin) == LOW;
   if (shieldPresent) {
-    handleShieldPresent();
+    if (heaterController[0].Compute()) analogWrite(heaterPin[0], PidOutput[0]);
+    if (heaterController[3].Compute()) analogWrite(heaterPin[3], PidOutput[3]);
   }
-  // General code
+
   timer.tick();
+  timerPcool.tick();
 
   if (esp8266.available() > 0) {
     String command = esp8266.readStringUntil('\n');
@@ -276,15 +277,6 @@ void loop() {
       asm volatile("  jmp 0");
     }
   }
-}
-
-void handleShieldPresent() {
-  for (int i = 0; i < ANALOG_CHANNELS; i++) {
-    if (heaterController[i].Compute()) {
-      analogWrite(heaterPin[i], PidOutput[i]);
-    }
-  }
-  timerPcool.tick();
 }
 
 void Tdropstartup(bool shieldPresent) {
@@ -303,9 +295,9 @@ void Tdropstartup(bool shieldPresent) {
   //timer.every(ResetTime, resetFunc);
 }
 
-void getstring() {
-  esp8266.println(str);  //the string containing the data is sent to the ESP for the web and dashboard
-}
+// void getstring() {
+//   esp8266.println(str);  //the string containing the data is sent to the ESP for the web and dashboard
+// }
 
 /*PCool initializaion, it is used if the module is loaded otherwise it is ignored*/
 void initializePCool() {
@@ -375,7 +367,7 @@ float ReadTemperatureChannel(unsigned char channel) {
 
   temperature = temperature / 10000;   // (R/Ro)
   temperature = log(temperature);      // ln(R/Ro)
-  temperature /= B;                 // 1/B * ln(R/Ro)
+  temperature /= B;                    // 1/B * ln(R/Ro)
   temperature += 1.0 / (25 + 273.15);  // + (1/To)
   temperature = 1.0 / temperature;     // Invert
   temperature -= 273.15;               // convert absolute temp to C
@@ -392,7 +384,7 @@ bool SendTemperatureChannel(unsigned char channel) {
 
   temperature = temperatureValue[channel] / 10000;  // (R/Ro)
   temperature = log(temperature);                   // ln(R/Ro)
-  temperature /= B;                              // 1/B * ln(R/Ro)
+  temperature /= B;                                 // 1/B * ln(R/Ro)
   temperature += 1.0 / (25 + 273.15);               // + (1/To)
   temperature = 1.0 / temperature;                  // Invert
   temperature -= 273.15;                            // convert absolute temp to C
@@ -725,9 +717,9 @@ void setParametersFromESP() {
   parametersStr = parametersStr.substring(parametersStr.indexOf('/') + 1);
   String pidSetPointStr = parametersStr.substring(0, parametersStr.indexOf('/'));
   parametersStr = parametersStr.substring(parametersStr.indexOf('/') + 1);
-  String newSetPointStr = parametersStr;
-  parametersStr = parametersStr.substring(parametersStr.indexOf('/') + 1);
   String sampleSurfaceStr = parametersStr;
+  parametersStr = parametersStr.substring(parametersStr.indexOf('/') + 1);
+  String newSetPointStr = parametersStr;
 
   // Convert the substrings to numerical values
   ntcBValue = ntcBValueStr.toInt();
@@ -768,7 +760,7 @@ void setParametersFromESP() {
     irr_cal = irrcal;
   }
   if (sampleSurface == 0) {
-    SAMPLE_SURFACE = Sample_Surface_Default; //Sample surface setted to default
+    SAMPLE_SURFACE = Sample_Surface_Default;  //Sample surface setted to default
   } else {
     SAMPLE_SURFACE = sampleSurface;
   }
@@ -791,7 +783,7 @@ void setParametersFromESP() {
   Serial.print(", SAM_SURFACE: ");
   Serial.println(sampleSurface, 4);  // Specify number of decimal places (e.g., 4 for 4 decimal places)
   Serial.print(", New_SET_PT_Temp: ");
-  Serial.print(newsetpoint,2);
+  Serial.print(newsetpoint, 2);
 }
 
 void Sensors_initialization() {
@@ -812,31 +804,31 @@ bool SendDataToESP8266(void *param) {
 #ifndef __DEBUG_ENABLED__
   if (pidvalue == 0 || pidvalue == 1) {  // Temp measured with the DHT
     PidSetpoint = t;
-} else if (pidvalue == 2) {  // Temp measured with the DHT2
+  } else if (pidvalue == 2) {  // Temp measured with the DHT2
     PidSetpoint = t2;
-} else if (pidvalue == 3) {  // Temp measured with the DHT3
+  } else if (pidvalue == 3) {  // Temp measured with the DHT3
     PidSetpoint = t3;
-} else if (pidvalue == 4) {  // Temp measured with the NTC on channel 0 TS1
+  } else if (pidvalue == 4) {  // Temp measured with the NTC on channel 0 TS1
     PidSetpoint = T[0];
-} else if (pidvalue == 5) {  // Temp measured with the NTC on channel 1 TS2
+  } else if (pidvalue == 5) {  // Temp measured with the NTC on channel 1 TS2
     PidSetpoint = T[1];
-} else if (pidvalue == 6) {  // Temp measured with the NTC on channel 2 TS3
+  } else if (pidvalue == 6) {  // Temp measured with the NTC on channel 2 TS3
     PidSetpoint = T[2];
-} else if (pidvalue == 7) {  // Temp measured with the NTC on channel 3 TS4
+  } else if (pidvalue == 7) {  // Temp measured with the NTC on channel 3 TS4
     PidSetpoint = T[3];
-} else if (pidvalue == 8) {  // Temp measured with the NTC on channel 4 TBox
+  } else if (pidvalue == 8) {  // Temp measured with the NTC on channel 4 TBox
     PidSetpoint = T[4];
-} else if (pidvalue == 10) {  
+  } else if (pidvalue == 10) {
     // Allow user to set PidSetpoint via newsetpoint with constraints
     if (newsetpoint > 0 && newsetpoint <= 60) {
-        PidSetpoint = newsetpoint;
+      PidSetpoint = newsetpoint;
     } else {
-        // Default value if newsetpoint is out of range
-        PidSetpoint = t;
+      // Default value if newsetpoint is out of range
+      PidSetpoint = t;
     }
-} else {
+  } else {
     PidSetpoint = t;  // Default value for any other value not specifically handled
-}
+  }
 #endif
   return true;
 }
@@ -861,7 +853,6 @@ void loggingTemperature(void) {
     h3 = 0;
     t3 = -273.15;
   }
-
 
   /* Measuring temperature from NTC probes*/
   loggingNTC();
@@ -900,7 +891,7 @@ bool GenerateESPString(bool shieldPresent) {
 
 
 void loggingNTC() {
-  for (uint8_t i = 0; i < numChannels; ++i) {
+  for (int i = 0; i < numChannels; ++i) {
     VRT[i] = (5.00 / 1023.00) * analogRead(analogPins[i]);  // Acquisition analog value of VRT
     VR[i] = VCC - VRT[i];
     RT[i] = VRT[i] / (VR[i] / R);  // Resistance of RT
@@ -1386,7 +1377,7 @@ void Draw_PCoolTemps() {
     u8g.print("PCool Temps");
 
     // First Temperature Value
-		u8g.setPrintPos(5, 30);
+    u8g.setPrintPos(5, 30);
     u8g.print("TPC1");
     u8g.setPrintPos(50, 30);
     u8g.print(averageTemperatureValue[0], 2);
@@ -1394,7 +1385,7 @@ void Draw_PCoolTemps() {
     u8g.print("C");
 
     // Second Temperature Value
-		u8g.setPrintPos(5, 45);
+    u8g.setPrintPos(5, 45);
     u8g.print("TPC2");
     u8g.setPrintPos(50, 45);
     u8g.print(averageTemperatureValue[3], 2);
@@ -1402,7 +1393,7 @@ void Draw_PCoolTemps() {
     u8g.print("C");
 
     // Third Temperature Value
-		u8g.setPrintPos(5, 60);
+    u8g.setPrintPos(5, 60);
     u8g.print("TsetP");
     u8g.setPrintPos(50, 60);
     u8g.print(PidSetpoint, 2);
