@@ -935,7 +935,7 @@ void SD_initialization(bool shieldPresent) {
     // Write appropriate header based on shield presence
     if (shieldPresent) {
       dataFile.print("Date & Time, TA1, H1, TA2, H2, TA3, H3, TS1, TS2, TS3, TS4, Tbx, Tbr, Ir, TAIR, TSIR");
-      dataFile.println(", PD1, TPC1, PD1, TPC2, TSet1");
+      dataFile.println(", PD1, TPC1, PD2, TPC2, TSet1");
       Serial.println("Date & Time, Tamb 1, H 1, Tamb2, H2, Tamb 3, H3, TS1, TS2, TS3, TS4, Tbox, Tboard, Irr, Tamb IR, TSky IR, PD1, TPC1, PD2, TPC2, TSet1");
     } else {
       dataFile.println("Date & Time, TA1, H1, TA2, H2, TA3, H3, TS1, TS2, TS3, TS4, Tbx, Tbr, Ir, TAIR, TSIR");
