@@ -231,11 +231,10 @@ void setup() {
   if (shieldPresent) {
     Serial.println("SHIELD_PRESENT");
     initializePCool();
-    Tdropstartup(shieldPresent);
   } else {
     Serial.println("SHIELD_NOT_PRESENT");
-    Tdropstartup(shieldPresent);
   }
+  Tdropstartup(shieldPresent);
 
 #ifdef __STARTUP_MESSAGE_ENABLED__
   Serial.print("PCool");
@@ -1453,7 +1452,7 @@ void setWiFiParametersFromESPWithProgressBar() {
   //unsigned long startTime = millis();
   bool parametersReceived = false;
 
-  while (!parametersReceived && millis() - startTime < 45000) {
+  while (!parametersReceived && millis() - startTime < 60000) {
     u8g.firstPage();
     do {
       u8g.setFont(u8g_font_6x10);
@@ -1467,7 +1466,7 @@ void setWiFiParametersFromESPWithProgressBar() {
       parametersReceived = true;  // Update parameters received status
     }
 
-    progress = map(millis() - startTime, 0, 45000, 0, 128);  // Update progress bar
+    progress = map(millis() - startTime, 0, 60000, 0, 128);  // Update progress bar
     delay(50);
   }
 }
