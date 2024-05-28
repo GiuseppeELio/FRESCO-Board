@@ -77,7 +77,7 @@ float SAMPLE_SURFACE;
 #define DHTPIN3 15
 #define ONE_WIRE_BUS2 8 /* Sensor on board*/ /*Remember to not put it in the parallel line of the sensors that go in the external box*/
 #define DHTTYPE DHT22                        // DHT 22  (AM2302)
-#define esp8266 Serial1                      //RX and TX settled on Serial1 --> RX2 and TX2 of Arduino Mega
+#define esp8266 Serial1                      //RX and TX set on Serial1 --> RX2 and TX2 of Arduino Mega
 /*NTC parameters*/
 #define RT0 10000  // Ω
 #define VCC 5      //Operating Voltage
@@ -195,7 +195,7 @@ BH1750 lightMeter;
 /* IR Sensor for Ambient and Sky temperature */
 Adafruit_MLX90614 mlx = Adafruit_MLX90614();
 /* SD CARD */
-const int chipSelect = 10;  //Pin used for SD module (Do not change it! it is defined on the PCB board)
+const int chipSelect = 10;  // Pin used for SD module (Do not change it! it is defined on the PCB board)
 File myFile;                // Create a file to store the data
 /* Real Time Clock */
 RTC_DS3231 rtc;  //RTC
@@ -224,7 +224,7 @@ void setup() {
   Serial.begin(115200);         // initialize serial communication at 57600 bits per second:
   esp8266.begin(115200);
   /**/
-  /*TDrop First, it is the module always mounted*/
+  /*TDrop First, it is always mounted*/
   pinMode(shieldPin, INPUT_PULLUP);
   bool shieldPresent = digitalRead(shieldPin) == LOW;
   /**/
@@ -503,7 +503,7 @@ bool ParseCommand(String inputString, pidCommand *dataStream) {
   String value = "";
   char cmdIndex = 0;
 
-  inputString.trim();                                         // remove head/end spaces, carrier return,.. any whitespace characters
+  inputString.trim();                                         // trim whitespaces, carriage return
   cmdIndex = inputString.indexOf(":");                        // separator command to value
   dataStream->parameter = inputString.substring(0, 2);        // put parameter in pidCommand struct
   dataStream->channel = inputString.substring(2, 3).toInt();  // put channel in pidCommand struct
@@ -662,7 +662,7 @@ void getDateTimeFromESP() {
   Serial.print("Date and Time from ESP8266: ");
   Serial.println(dateTimeStr);
 
-  // Extract date and time components
+  // Parse date and time
   int year, month, day, hour, minute, second;
   sscanf(dateTimeStr.c_str(), "%d/%d/%d %d:%d:%d",
          &year, &month, &day, &hour, &minute, &second);
@@ -739,27 +739,27 @@ void setParametersFromESP() {
     B = ntcBValue;
   }
   if (savingTime == 0 || savingTime < 1000) {
-    TASK1 = TASK1_default;  //  Saving time setted to default
+    TASK1 = TASK1_default;  //  Saving time set to default
   } else {
     TASK1 = savingTime;
   }
   if (dataTransferTime == 0 || dataTransferTime < 5000) {
-    TASK2 = TASK2_default;  // transfer time to ESP setted to default
+    TASK2 = TASK2_default;  // transfer time to ESP set to default
   } else {
     TASK2 = dataTransferTime;
   }
   if (displayingTime == 0 || displayingTime < 3000) {
-    TASK3 = TASK3_default;  // Displaying time setted to default
+    TASK3 = TASK3_default;  // Displaying time set to default
   } else {
     TASK3 = displayingTime;
   }
   if (irrcal == 0) {
-    irr_cal = irrcal_default;  // Irradiance setted to default
+    irr_cal = irrcal_default;  // Irradiance set to default
   } else {
     irr_cal = irrcal;
   }
   if (sampleSurface == 0) {
-    SAMPLE_SURFACE = Sample_Surface_Default;  //Sample surface setted to default
+    SAMPLE_SURFACE = Sample_Surface_Default;  //Sample surface set to default
   } else {
     SAMPLE_SURFACE = sampleSurface;
   }
@@ -853,18 +853,18 @@ void loggingTemperature(void) {
     t3 = -273.15;
   }
 
-  /* Measuring temperature from NTC probes*/
+  /* Read temperature from NTC probes */
   loggingNTC();
-  /*Measuring temperature on board*/
+  /* Measuring temperature on board */
   sensorsBoard.requestTemperatures();
   tempBoard = sensorsBoard.getTempCByIndex(0);
 
-  /*Measuring the irradiance*/
+  /* Read irradiance */
   uint16_t lux = lightMeter.readLightLevel();
   irr = (lux * 0.0079) * irr_cal;
 
 
-  /*Measuring the temperature of ambient and sky using the MLX*/
+  /* Read ambient and sky temperatures from the MLX */
   IR_temp_amb = mlx.readAmbientTempC();
   if (isnan(IR_temp_amb)) {
     IR_temp_amb = 0;
@@ -891,7 +891,7 @@ bool GenerateESPString(bool shieldPresent) {
 
 void loggingNTC() {
   for (int i = 0; i < numChannels; ++i) {
-    VRT[i] = (5.00 / 1023.00) * analogRead(analogPins[i]);  // Acquisition analog value of VRT
+    VRT[i] = (5.00 / 1023.00) * analogRead(analogPins[i]);  // Read analog value of VRT
     VR[i] = VCC - VRT[i];
     RT[i] = VRT[i] / (VR[i] / R);  // Resistance of RT
     ln[i] = log(RT[i] / RT0);
@@ -907,7 +907,7 @@ void RTC_initialization() {
   }
   //rtc.adjust(DateTime((__DATE__), (__TIME__))); // Use this command in order to set the rigth Date and time on the RTC
   if (rtc.lostPower()) {
-    Serial.println("RTC lost power, lets set the time!");
+    Serial.println("RTC lost power, let's set the time!");
     //Comment out below lines once you set the date & time.
     rtc.adjust(DateTime((__DATE__), (__TIME__)));
   }
@@ -931,7 +931,7 @@ void SD_initialization(bool shieldPresent) {
   if (dataFile) {
     Serial.println("File created: " + filename);
 
-    // Write appropriate header based on shield presence
+    // Write appropriate header based on what shields are connected
     if (shieldPresent) {
       dataFile.print("Date & Time, TA1, H1, TA2, H2, TA3, H3, TS1, TS2, TS3, TS4, Tbx, Tbr, Ir, TAIR, TSIR");
       dataFile.println(", PD1, TPC1, PD2, TPC2, TSet1");
@@ -978,7 +978,7 @@ void Wifi_status() {
     if (received == 'C') {
       wifi_status = "Done";
       Serial.println("wifi ok");
-      // Read and update access point IP
+      // Read and update access point IP address
       apIP = "";
       while (esp8266.available() > 0) {
         char apIPChar = esp8266.read();
@@ -989,7 +989,7 @@ void Wifi_status() {
       }
       Serial.print("Access Point IP: ");
       Serial.println(apIP);
-      // Read and update local WiFi IP
+      // Read and update local WiFi IP address
       localIP = "";
       while (esp8266.available() > 0) {
         char localIPChar = esp8266.read();
@@ -1005,7 +1005,7 @@ void Wifi_status() {
     } else if (received == 'D') {
       wifi_status = "Fail";
       Serial.println("wifi fail");
-      // Read and update access point IP
+      // Read and update access point IP address
       apIP = "";
       while (esp8266.available() > 0) {
         char apIPChar = esp8266.read();
@@ -1016,7 +1016,7 @@ void Wifi_status() {
       }
       Serial.print("Access Point IP: ");
       Serial.println(apIP);
-      // Read and update local WiFi IP
+      // Read and update local WiFi IP address
       localIP = "";
       while (esp8266.available() > 0) {
         char localIPChar = esp8266.read();
@@ -1031,10 +1031,10 @@ void Wifi_status() {
   }
 }
 
-/*Saving data on SD card file and print data on the terminal*/
+/* Saving data on SD card file and print data on the terminal */
 bool datalog(void *param) {
   bool *shieldPresent = (bool *)param;
-  DateTime now = rtc.now();  //HAVE TO BE SOSTITUTED WITH THE NTP TIME
+  DateTime now = rtc.now();  // TODO: REPLACE WITH NTP TIME
   Date = String(now.day(), DEC) + String("/") + String(now.month(), DEC) + String("/") + String(now.year(), DEC);
   Time = String(now.hour(), DEC) + String(":") + String(now.minute(), DEC) + String(":") + String(now.second(), DEC);
   Date_Time = String(Date) + String(" ") + String(Time);
@@ -1505,31 +1505,31 @@ bool displaying_data(void *param) {
       Draw_dateandtime();
       break;
     case 2:
-      // Display temperature and humidity 1
+      // Display Tamb and humidity 1
       Draw_th1();
       break;
     case 3:
-      // Display temperature and humidity 2
+      // Display Tamb and humidity 2
       Draw_th2();
       break;
     case 4:
-      // Display temperature and humidity 2
+      // Display Tamb and humidity 3
       Draw_th3();
       break;
     case 5:
-      // Display temperature and humidity 2
+      // Display Tsample 1 and 2
       Draw_t1t2();
       break;
     case 6:
-      // Display temperature and humidity 2
+      // Display Tsample 3 and 4
       Draw_t3t4();
       break;
     case 7:
-      // Display temperature and humidity 2
+      // Display Tbox and Tboard
       Draw_tBxtBr();
       break;
     case 8:
-      // Display temperature and humidity 2
+      // Display solar irradiance and Tsky
       Draw_TSirr();
       break;
     case 9:
