@@ -27,6 +27,10 @@ The schematic representation reports the workflow among Arduino, the ESP8266 for
 In order to use the choseen sensors that equip the TDrop shield such as: BH1750 (irradiance), Dallas DS18B20 (Temperature), DHT22 (temp and Humidity), DS3231 (clocker), and MLX90614 (IR temperature Ambient (near) and Sky (far))
 it is necessary to install/ include the available [libraries](https://github.com/GiuseppeELio/FRESCO-Board/blob/main/libraries.zip).
 
+## Temperature probes
+
+In the following downloadable document [NTCs](https://github.com/GiuseppeELio/FRESCO-Board/blob/main/doc/Advised%20NTC%20thermocouples.pdf) you can find the B (K) constant values for the reccomended NTCs that have been tested. 
+
 ## ESP8266 WiFi connection and data transmissione. 
 
 As reported in the pdf file ["FRESCO Board startup_Software"](https://github.com/GiuseppeELio/FRESCO-Board/blob/main/doc/FRESCO%20Board%20startup_Software.pdf) the FRESCO board is equipped with a WiFi network board to communicate and exchange information through a network and show the data directly on your device by a hot spot netwrok or connecting on the local IP of the selected WiFi. On the other hand, it allows sending the data on a remote server using Raspberry or a Linux PC/Server and then save the data on "InfluxDB V2" and display them on "Grafana" dashboard. 
