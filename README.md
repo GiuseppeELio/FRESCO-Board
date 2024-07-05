@@ -15,7 +15,7 @@ The board as shown in the figure is composed by a main board, a TDrop shield tha
 
 The inventors of FRESCO acknowledge the economic support offered by the CoolingPhotonics Company in the research project under techonoligcal transfer agreement named "FRESCO - Data Logger".  They also thanks the scientific  fruitful discussion offered in the framework of the PaRaMetric (EURAMET - European Partnership on Metrology), and the technical support offered by the joitlab - electronic workshop- of University of Florence and National Metrology Institute of Italy (INRIM). 
 
-![alt text](doc/img/Partners_logo.png)
+![alt text](doc/img/loghi.png)
 
 ## A supporter is worth a thousand followers.
 
