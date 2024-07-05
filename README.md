@@ -11,6 +11,12 @@ The code reported in this repository are related to a data logger realization ab
 
 The board as shown in the figure is composed by a main board, a TDrop shield that allows measuring the temperature for multiple samples, the solar irradiance, the sky temperature using an IR sensor, ambient temperature and relative humidity using a DHT22, store data on a onboard SD card. It is also equipped with a RTC clock for the correct time and a ESP8266-12F module for the WiFi connection and communication. The PCool shield is equipped with NTC to measure the sample temperature and a PID system to warm-up them to the setting point temperature that usually is the ambient temperature. 
 
+## Acknowledgements.
+
+The inventors of FRESCO acknowledge the economic support offered by the CoolingPhotonics Company in the research project under techonoligcal transfer agreement named "FRESCO - Data Logger".  They also thanks the scientific  fruitful discussion offered in the framework of the PaRaMetric (EURAMET - European Partnership on Metrology), and the technical support offered by the joitlab - electronic workshop- of University of Florence and National Metrology Institute of Italy (INRIM). 
+
+![alt text](doc/img/Partners_logo.png)
+
 ## A supporter is worth a thousand followers.
 
 Dear reader, if you are interested in the development of FRESCO and its improvement with new features, please support our team by using the support button or by going directly to 
