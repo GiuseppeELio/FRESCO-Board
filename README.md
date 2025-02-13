@@ -13,6 +13,9 @@ The board as shown in the figure is composed by a main board, a TDrop shield tha
 
 The entire documentation will be soon available on the Zenodo repository at the following link [10.5281/zenodo.13624486](10.5281/zenodo.13624486)
 
+Details about the research and the results obtained with FRESCO are available on the following "PrePrint":
+Wèrlè, Jeremy and Concas, Roberto and Pini, Ernesto and Wiersma, Diederik S. and Pattelli, Lorenzo and Lio, Giuseppe Emanuele and Administrator, Sneak Peek, FRESCO-Board: A Low-Cost Open Platform for Comprehensive Testing of Passive Radiative Cooling Materials. Available at SSRN: https://ssrn.com/abstract=5132927 or http://dx.doi.org/10.2139/ssrn.5132927
+
 ## Acknowledgements.
 
 The inventors of FRESCO acknowledge the economic support offered by the CoolingPhotonics Company in the research project under techonoligcal transfer agreement named "FRESCO - Data Logger".  They also thanks the scientific  fruitful discussion offered in the framework of the PaRaMetric (EURAMET - European Partnership on Metrology), and the technical support offered by the joitlab - electronic workshop- of University of Florence and National Metrology Institute of Italy (INRIM). 
