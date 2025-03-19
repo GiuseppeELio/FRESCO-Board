@@ -503,7 +503,7 @@ bool ParseCommand(String inputString, pidCommand *dataStream) {
   String value = "";
   char cmdIndex = 0;
 
-  inputString.trim();                                         // trim whitespaces, carriage return
+  inputString.trim();                                         // remove head/end spaces, carrier return,.. any whitespace characters
   cmdIndex = inputString.indexOf(":");                        // separator command to value
   dataStream->parameter = inputString.substring(0, 2);        // put parameter in pidCommand struct
   dataStream->channel = inputString.substring(2, 3).toInt();  // put channel in pidCommand struct
@@ -744,7 +744,7 @@ void setParametersFromESP() {
     TASK1 = savingTime;
   }
   if (dataTransferTime == 0 || dataTransferTime < 5000) {
-    TASK2 = TASK2_default;  // transfer time to ESP set to default
+    TASK2 = TASK2_default;  // transfer time to ESP setted to default
   } else {
     TASK2 = dataTransferTime;
   }
@@ -754,7 +754,7 @@ void setParametersFromESP() {
     TASK3 = displayingTime;
   }
   if (irrcal == 0) {
-    irr_cal = irrcal_default;  // Irradiance set to default
+    irr_cal = irrcal_default;  // Irradiance setted to default
   } else {
     irr_cal = irrcal;
   }
@@ -853,18 +853,18 @@ void loggingTemperature(void) {
     t3 = -273.15;
   }
 
-  /* Read temperature from NTC probes */
+  /* Measuring temperature from NTC probes*/
   loggingNTC();
   /* Measuring temperature on board */
   sensorsBoard.requestTemperatures();
   tempBoard = sensorsBoard.getTempCByIndex(0);
 
-  /* Read irradiance */
+  /*Measuring the irradiance*/
   uint16_t lux = lightMeter.readLightLevel();
   irr = (lux * 0.0079) * irr_cal;
 
 
-  /* Read ambient and sky temperatures from the MLX */
+  /*Measuring the temperature of ambient and sky using the MLX*/
   IR_temp_amb = mlx.readAmbientTempC();
   if (isnan(IR_temp_amb)) {
     IR_temp_amb = 0;
@@ -931,7 +931,7 @@ void SD_initialization(bool shieldPresent) {
   if (dataFile) {
     Serial.println("File created: " + filename);
 
-    // Write appropriate header based on what shields are connected
+    // Write appropriate header based on shield presence
     if (shieldPresent) {
       dataFile.print("Date & Time, TA1, H1, TA2, H2, TA3, H3, TS1, TS2, TS3, TS4, Tbx, Tbr, Ir, TAIR, TSIR");
       dataFile.println(", PD1, TPC1, PD2, TPC2, TSet1");
@@ -978,7 +978,7 @@ void Wifi_status() {
     if (received == 'C') {
       wifi_status = "Done";
       Serial.println("wifi ok");
-      // Read and update access point IP address
+      // Read and update access point IP
       apIP = "";
       while (esp8266.available() > 0) {
         char apIPChar = esp8266.read();
@@ -989,7 +989,7 @@ void Wifi_status() {
       }
       Serial.print("Access Point IP: ");
       Serial.println(apIP);
-      // Read and update local WiFi IP address
+      // Read and update local WiFi IP
       localIP = "";
       while (esp8266.available() > 0) {
         char localIPChar = esp8266.read();
@@ -1005,7 +1005,7 @@ void Wifi_status() {
     } else if (received == 'D') {
       wifi_status = "Fail";
       Serial.println("wifi fail");
-      // Read and update access point IP address
+       // Read and update access point IP
       apIP = "";
       while (esp8266.available() > 0) {
         char apIPChar = esp8266.read();
@@ -1016,7 +1016,7 @@ void Wifi_status() {
       }
       Serial.print("Access Point IP: ");
       Serial.println(apIP);
-      // Read and update local WiFi IP address
+      // Read and update local WiFi IP
       localIP = "";
       while (esp8266.available() > 0) {
         char localIPChar = esp8266.read();
@@ -1031,10 +1031,10 @@ void Wifi_status() {
   }
 }
 
-/* Saving data on SD card file and print data on the terminal */
+/*Saving data on SD card file and print data on the terminal*/
 bool datalog(void *param) {
   bool *shieldPresent = (bool *)param;
-  DateTime now = rtc.now();  // TODO: REPLACE WITH NTP TIME
+  DateTime now = rtc.now();  //HAVE TO BE SOSTITUTED WITH THE NTP TIME
   Date = String(now.day(), DEC) + String("/") + String(now.month(), DEC) + String("/") + String(now.year(), DEC);
   Time = String(now.hour(), DEC) + String(":") + String(now.minute(), DEC) + String(":") + String(now.second(), DEC);
   Date_Time = String(Date) + String(" ") + String(Time);
@@ -1350,17 +1350,17 @@ void Draw_powerDensity() {
     draw();
     u8g.setFont(u8g_font_8x13);
     u8g.setPrintPos(5, 30);
-    u8g.print("PD 0");
+    u8g.print("PD 1");
     u8g.setPrintPos(10, 40);
     u8g.print(powerDensity[0]);
     u8g.setPrintPos(55, 40);
-    u8g.print("W/mq");
+    u8g.print("W/m2");
     u8g.setPrintPos(5, 50);
-    u8g.print("PD 3");
+    u8g.print("PD 2");
     u8g.setPrintPos(10, 60);
     u8g.print(powerDensity[3]);
     u8g.setPrintPos(55, 60);
-    u8g.print("W/mq");
+    u8g.print("W/m2");
     u8g.drawBitmapP(90, 25, 4, 32, heat_icon);
   } while (u8g.nextPage());
 }
