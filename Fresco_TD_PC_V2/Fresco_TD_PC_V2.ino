@@ -1300,6 +1300,17 @@ void drawLIP() {
   } while (u8g.nextPage());
 }
 
+void drawBETA() {
+  u8g.firstPage();
+  do {
+    draw();
+    u8g.setFont(u8g_font_8x13);
+    u8g.setPrintPos(3, 30);
+    u8g.print("NTC Beta value");
+    u8g.setPrintPos(10, 50);
+    u8g.print(B);
+  } while (u8g.nextPage());
+}
 void Draw_dateandtime() {
   u8g.firstPage();
   do {
@@ -1590,6 +1601,10 @@ void init_screen() {
   startTime = millis();  // Reset the start time
   while (millis() - startTime < 2000) {
     drawLIP();
+  }
+  startTime = millis();  // Reset the start time
+  while (millis() - startTime < 2000) {
+    drawBETA();
   }
   u8g.firstPage();  // first page
   do {
