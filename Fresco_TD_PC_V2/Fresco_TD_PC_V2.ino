@@ -450,7 +450,7 @@ bool SendCurrentChannel(unsigned char channel) {
 #ifdef __SEND_POWER_DENSITY__
   Serial.print(">PowerDensity(");
   Serial.print(channel);
-  Serial.print(")[W/mq]:");
+  Serial.print(")[W/m2]:");
   Serial.println(powerDensity[channel], 2);
 #endif
 #endif
