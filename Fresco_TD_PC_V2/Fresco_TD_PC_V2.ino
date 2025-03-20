@@ -66,6 +66,11 @@ float SAMPLE_SURFACE;
 #define PIN_PWM2 4
 #define PIN_PWM3 5
 
+#define PIN_NTC_TDROP0 A0
+#define PIN_NTC_TDROP1 A1
+#define PIN_NTC_TDROP2 A2
+#define PIN_NTC_TDROP3 A3
+#define PIN_NTC_TDROP4 A4
 
 /* PID */
 #define PID_PARAMETER_GET_CHAR "?"
@@ -93,9 +98,13 @@ int B = 3380;           //  K NTC part number NXFT15XH103FA2B100 or 3455
 #define TASK1_default 2000
 #define TASK2_default 10000
 #define TASK3_default 3000
-unsigned int TASK1 = 2000;   //gettemp
-unsigned int TASK2 = 10000;  //Log data and send them using string
-unsigned int TASK3 = 3000;
+unsigned int TASK0 = 10;   	//gettemp fast reading before move mean
+unsigned int TASK1 = 1000;	//gettemp average
+unsigned int TASK2 = 2000;  //gettemp
+unsigned int TASK3 = 3000;	// display
+unsigned int TASK4 = 10000;  //Log data and send them using string
+
+
 static uint8_t displayState = 0;
 int pidvalue = 0;
 double newsetpoint = 0;
@@ -139,6 +148,7 @@ double currentCalibration = 1000 * PSUPPLY_VOLTAGE * R_SHUNT / (R_SHUNT + R_LOAD
 //double POWER_DENSITY_FACTOR = 1000 * (float)PSUPPLY_VOLTAGE * (R_LOAD / (R_SHUNT + R_LOAD)) / SAMPLE_SURFACE;
 int count = 0;
 long temperatureCounter = 0;
+long temperatureCounterNTC = 0;
 long currentCounter = 0;
 
 double currentValue[ANALOG_CHANNELS] = { 0, 0, 0, 0 };
@@ -153,7 +163,7 @@ const uint8_t temperatureSensingPin[ANALOG_CHANNELS] = { PIN_NTC0, PIN_NTC1, PIN
 const uint8_t heaterPin[ANALOG_CHANNELS] = { PIN_PWM0, PIN_PWM1, PIN_PWM2, PIN_PWM3 };
 
 /*Timer definition*/
-Timer<4> timer;                                                   // create a timer with N tasks and microsecond resolution
+Timer<5> timer;                                                   // create a timer with N tasks and microsecond resolution
 Timer<4, micros> timerPcool;  // create a timer with 1 task and microsecond resolution
 
 String receivedString = "";   // a String to hold incoming data
@@ -212,6 +222,10 @@ const unsigned long displayInterval = 2000;  // Adjust the interval as needed
 const int numChannels = 5;
 const int numOtherSensors = 10;
 int analogPins[numChannels] = { A0, A1, A2, A3, A4 };
+const uint8_t temperatureSensingPinNTC[numChannels] = { PIN_NTC_TDROP0, PIN_NTC_TDROP1, PIN_NTC_TDROP2, PIN_NTC_TDROP3, PIN_NTC_TDROP4 };
+
+double averageTemperatureNTCValue[numChannels] = {0, 0, 0, 0 ,0}; // create list to contain avg NTC temp
+double temperatureValueNTC[numChannels] = { 0, 0, 0, 0, 0 };      // create list to contain NTC temp
 float VRT[numChannels];
 float VR[numChannels];
 float RT[numChannels];
@@ -288,9 +302,13 @@ void Tdropstartup(bool shieldPresent) {
   init_screen();                              // Initialize screen
   /* Timer setup */
   /*TDrop*/
-  timer.every(TASK1, datalog, &shieldPresent);
-  timer.every(TASK2, SendDataToESP8266, &shieldPresent);
+  // Measurement of NTC temp
+  timer.every(TASK0,SetTemperatureNTC, &shieldPresent);
+  // To know date and time
+  timer.every(TASK1, SendTemperatureNTC);
+  timer.every(TASK2, datalog, &shieldPresent);
   timer.every(TASK3, displaying_data, &shieldPresent);
+  timer.every(TASK4, SendDataToESP8266, &shieldPresent);
   //timer.every(ResetTime, resetFunc);
 }
 
@@ -327,6 +345,28 @@ bool SetTemperature(void *) {
   return true;
 }
 
+bool SetTemperatureNTC(void *) {
+  //bool *shieldPresent = (bool *)param;
+  SetTemperatureChannelNTC(0);
+  SetTemperatureChannelNTC(1);
+  SetTemperatureChannelNTC(2);
+  SetTemperatureChannelNTC(3);
+  SetTemperatureChannelNTC(4);
+
+  temperatureCounterNTC++;
+  return true;
+}
+
+bool SendTemperatureNTC(void *) {
+  //  bool *shieldPresent = (bool *)param;
+  SendTemperatureChannelNTC(0);
+  SendTemperatureChannelNTC(1);
+  SendTemperatureChannelNTC(2);
+  SendTemperatureChannelNTC(3);
+  SendTemperatureChannelNTC(4);
+  temperatureCounterNTC = 0;
+  return true;
+}
 bool SendTemperature(void *) {
   //bool *shieldPresent = (bool *)param;
   SendTemperatureChannel(0);
@@ -358,6 +398,11 @@ bool SetTemperatureChannel(unsigned char channel) {
   return true;
 }
 
+/* Temperature */
+bool SetTemperatureChannelNTC(unsigned char channel) {
+  ReadTemperatureChannelNTC(channel);
+  return true;
+}
 float ReadTemperatureChannel(unsigned char channel) {
   float temperature = analogRead(temperatureSensingPin[channel]);
   temperatureValue[channel] += temperature;
@@ -374,6 +419,10 @@ float ReadTemperatureChannel(unsigned char channel) {
   return temperature;
 }
 
+void ReadTemperatureChannelNTC(unsigned char channel) {
+  float temperature = analogRead(temperatureSensingPinNTC[channel]);
+  temperatureValueNTC[channel] += temperature;
+}
 bool SendTemperatureChannel(unsigned char channel) {
 
   float temperature;
@@ -422,6 +471,52 @@ bool SendTemperatureChannel(unsigned char channel) {
   return true;
 }
 /*---*/
+bool SendTemperatureChannelNTC(unsigned char channel) {
+
+  float temperature;
+  temperatureValueNTC[channel] /= temperatureCounterNTC;
+  temperatureValueNTC[channel] = 1023 / temperatureValueNTC[channel] - 1;
+  temperatureValueNTC[channel] = 10000 / temperatureValueNTC[channel];
+
+  temperature = temperatureValueNTC[channel] / 10000;  // (R/Ro)
+  temperature = log(temperature);                   // ln(R/Ro)
+  temperature /= B;                                 // 1/B * ln(R/Ro)
+  temperature += 1.0 / (25 + 273.15);               // + (1/To)
+  temperature = 1.0 / temperature;                  // Invert
+  temperature -= 273.15;                            // convert absolute temp to C
+
+  averageTemperatureNTCValue[channel] = temperature;
+
+#ifdef __SPLOT_ENABLED__
+  Serial.print("Ch");
+  Serial.print(channel);
+  Serial.print("--->Setpoint[°C]:");
+  Serial.print(PidSetpoint, 1);
+  Serial.print(",Temperature[°C]:");
+  Serial.print(temperature);
+  Serial.print(",PIDout:");
+  Serial.println(PidOutput[channel]);
+#endif
+
+#ifdef __TELEPLOT_ENABLED__
+  //Serial.print(channel);
+  Serial.print(">Setpoint(");
+  Serial.print(channel);
+  Serial.print(")[°C]:");
+  Serial.println(PidSetpoint, 1);
+  Serial.print(">Temperature(");
+  Serial.print(channel);
+  Serial.print(")[°C]:");
+  Serial.println(temperature);
+  Serial.print(">PIDout(");
+  Serial.print(channel);
+  Serial.print("):");
+  Serial.println(PidOutput[channel]);
+#endif
+
+  temperatureValueNTC[channel] = 0;
+  return true;
+}
 
 
 /* Current */
@@ -797,7 +892,7 @@ void Sensors_initialization() {
 
 bool SendDataToESP8266(void *param) {
   bool *shieldPresent = (bool *)param;
-  loggingTemperature();
+  //loggingTemperature(); //NTC temperature not averaged
   GenerateESPString(*shieldPresent);
   esp8266.println(str);
 #ifndef __DEBUG_ENABLED__
@@ -808,15 +903,20 @@ bool SendDataToESP8266(void *param) {
   } else if (pidvalue == 3) {  // Temp measured with the DHT3
     PidSetpoint = t3;
   } else if (pidvalue == 4) {  // Temp measured with the NTC on channel 0 TS1
-    PidSetpoint = T[0];
+    //PidSetpoint = T[0]; //NTC temperature not averaged
+	PidSetpoint = averageTemperatureNTCValue[0];
   } else if (pidvalue == 5) {  // Temp measured with the NTC on channel 1 TS2
-    PidSetpoint = T[1];
+    //PidSetpoint = T[1]; //NTC temperature not averaged
+	PidSetpoint = averageTemperatureNTCValue[1];
   } else if (pidvalue == 6) {  // Temp measured with the NTC on channel 2 TS3
-    PidSetpoint = T[2];
+    //PidSetpoint = T[2]; //NTC temperature not averaged
+	PidSetpoint = averageTemperatureNTCValue[2];
   } else if (pidvalue == 7) {  // Temp measured with the NTC on channel 3 TS4
-    PidSetpoint = T[3];
+    //PidSetpoint = T[3]; //NTC temperature not averaged
+	PidSetpoint = averageTemperatureNTCValue[3];
   } else if (pidvalue == 8) {  // Temp measured with the NTC on channel 4 TBox
-    PidSetpoint = T[4];
+    //PidSetpoint = T[4]; //NTC temperature not averaged
+	PidSetpoint = averageTemperatureNTCValue[4];
   } else if (pidvalue == 10) {
     // Allow user to set PidSetpoint via newsetpoint with constraints
     if (newsetpoint > 0 && newsetpoint <= 60) {
@@ -854,7 +954,7 @@ void loggingTemperature(void) {
   }
 
   /* Read temperature from NTC probes */
-  loggingNTC();
+  //loggingNTC(); //NTC temperature not averaged
   /* Read temperature on board */
   sensorsBoard.requestTemperatures();
   tempBoard = sensorsBoard.getTempCByIndex(0);
@@ -878,7 +978,10 @@ void loggingTemperature(void) {
 bool GenerateESPString(bool shieldPresent) {
   str = "";
   // Common data for both cases
-  str += String(t) + String(",") + String(h) + String(",") + String(t2) + String(",") + String(h2) + String(",") + String(t3) + String(",") + String(h3) + String(",") + String(T[0]) + String(",") + String(T[1]) + String(",") + String(T[2]) + String(",") + String(T[3]) + String(",") + String(T[4]) + String(",") + String(tempBoard) + String(",") + String(irr) + String(",") + String(IR_temp_amb) + String(",") + String(IR_temp_sky);
+  // String to save not averaged temperatures
+  //str += String(t) + String(",") + String(h) + String(",") + String(t2) + String(",") + String(h2) + String(",") + String(t3) + String(",") + String(h3) + String(",") + String(T[0]) + String(",") + String(T[1]) + String(",") + String(T[2]) + String(",") + String(T[3]) + String(",") + String(T[4]) + String(",") + String(tempBoard) + String(",") + String(irr) + String(",") + String(IR_temp_amb) + String(",") + String(IR_temp_sky);
+  // String to save averaged temperatures
+  str += String(t) + String(",") + String(h) + String(",") + String(t2) + String(",") + String(h2) + String(",") + String(t3) + String(",") + String(h3) + String(",") + String(averageTemperatureNTCValue[0]) + String(",") + String(averageTemperatureNTCValue[1]) + String(",") + String(averageTemperatureNTCValue[2]) + String(",") + String(averageTemperatureNTCValue[3]) + String(",") + String(averageTemperatureNTCValue[4]) + String(",") + String(tempBoard) + String(",") + String(irr) + String(",") + String(IR_temp_amb) + String(",") + String(IR_temp_sky);
 
   // Include PCool module specific data if shield is present
   if (shieldPresent) {
@@ -1277,11 +1380,13 @@ void Draw_t1t2() {
     u8g.setPrintPos(3, 30);
     u8g.print("Tsample 1 and 2");
     u8g.setPrintPos(5, 40);
-    u8g.print(T[0], 2);
+    //u8g.print(T[0], 2); //NTC temperature not averaged
+	u8g.print(averageTemperatureNTCValue[0], 2);
     u8g.setPrintPos(65, 40);
     u8g.print("C");
     u8g.setPrintPos(10, 60);
-    u8g.print(T[1], 2);
+    //u8g.print(T[1], 2); //NTC temperature not averaged
+	u8g.print(averageTemperatureNTCValue[1], 2);
     u8g.setPrintPos(75, 60);
     u8g.print("C");
     u8g.drawBitmapP(90, 35, 4, 32, Therm_icon);
@@ -1296,11 +1401,13 @@ void Draw_t3t4() {
     u8g.setPrintPos(3, 30);
     u8g.print("Tsample 3 and 4");
     u8g.setPrintPos(5, 40);
-    u8g.print(T[2], 2);
+    //u8g.print(T[2], 2); //NTC temperature not averaged
+	u8g.print(averageTemperatureNTCValue[2], 2);
     u8g.setPrintPos(65, 40);
     u8g.print("C");
     u8g.setPrintPos(10, 60);
-    u8g.print(T[3], 2);
+    //u8g.print(T[3], 2); //NTC temperature not averaged
+	u8g.print(averageTemperatureNTCValue[3], 2);
     u8g.setPrintPos(75, 60);
     u8g.print("C");
     u8g.drawBitmapP(90, 35, 4, 32, Therm_icon);
