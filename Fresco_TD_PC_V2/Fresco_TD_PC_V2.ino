@@ -144,13 +144,13 @@ PID heaterController[ANALOG_CHANNELS] = {
 
 
 /*---------*/
-double currentCalibration = 1000 * PSUPPLY_VOLTAGE * R_SHUNT / (R_SHUNT + R_LOAD);
+double currentCalibration = 1000 * PSUPPLY_VOLTAGE * R_SHUNT / (R_SHUNT + R_LOAD); // tension at R_SHUNT
 //double POWER_DENSITY_FACTOR = 1000 * (float)PSUPPLY_VOLTAGE * (R_LOAD / (R_SHUNT + R_LOAD)) / SAMPLE_SURFACE;
 int count = 0;
 long temperatureCounter = 0;
 long temperatureCounterNTC = 0;
 long currentCounter = 0;
-
+double Imax_R_LOAD = PSUPPLY_VOLTAGE * R_LOAD / (R_SHUNT + R_LOAD); // max current initialization* R_LOAD
 double currentValue[ANALOG_CHANNELS] = { 0, 0, 0, 0 };
 double currentCalibrationValue[ANALOG_CHANNELS] = { 0, 0, 0, 0 };
 double powerDensity[ANALOG_CHANNELS] = { 0, 0, 0, 0 };
@@ -528,11 +528,11 @@ bool GetCurrentChannel(unsigned char channel) {
 bool SendCurrentChannel(unsigned char channel) {
 
   currentValue[channel] /= currentCounter;
-  currentValue[channel] *= currentCalibration;
-  currentValue[channel] /= currentCalibrationValue[channel];
+  currentValue[channel] *= currentCalibration;// *V_LOAD
+  currentValue[channel] /= currentCalibrationValue[channel]; // maximum current value during the initialization (ADC)
 
   powerDensity[channel] = currentValue[channel] / 1000;
-  powerDensity[channel] *= PSUPPLY_VOLTAGE;
+  powerDensity[channel] *= Imax_R_LOAD; // Maximum current value during the initialization* R_LOAD
   powerDensity[channel] /= SAMPLE_SURFACE;
 
 #ifdef __TELEPLOT_ENABLED__
