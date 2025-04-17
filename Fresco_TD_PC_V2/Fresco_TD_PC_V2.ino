@@ -1433,7 +1433,7 @@ void Draw_tBxtBr() {
     u8g.setPrintPos(3, 30);
     u8g.print("TBox and Board");
     u8g.setPrintPos(5, 40);
-    u8g.print(T[4], 2);
+    u8g.print(averageTemperatureNTCValue[4], 2);
     u8g.setPrintPos(65, 40);
     u8g.print("C");
     u8g.setPrintPos(10, 60);
