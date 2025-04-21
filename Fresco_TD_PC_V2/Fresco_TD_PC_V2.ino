@@ -2,7 +2,6 @@
 #include <PID_v1_rc.h>
 #include <arduino-timer.h>
 /* Tdrop Includes */
-//#include <arduino-timer.h>
 #include <OneWire.h>
 #include <DallasTemperature.h>
 #include <DHT.h>
@@ -15,23 +14,16 @@
 #include <SD.h>
 #include <string.h>
 
-//#define __ECHO_ENABLED__
-//#define __DEBUG_ENABLED__
-//#define __SPLOT_ENABLED__
-//#define __TELEPLOT_ENABLED__
-//#define __CURRENT_DEBUG_ENABLED__
 #define __STARTUP_MESSAGE_ENABLED__
 
 #define __SEND_CURRENT__
 #define __SEND_POWER_DENSITY__
 
-
-
 /* Firmware Version */
-#define __FW_MAJVERSION__ 2
+#define __FW_MAJVERSION__ 3
 #define __FW_MINVERSION__ 0
 //#define __FW_BUILDVERSION__     0       // if not equal to 0 (zero) EEPROM is reset to default values
-#define __FW_AUTHOR__ "RConcas and GELio"
+#define __FW_AUTHOR__ "RConcas, JWerlé and GELio"
 
 #define PCOOL_GET_TEMPERATURE_TIMER 10000  // 10 ms
 #define PCOOL_PIDOUT 1000000               // 1 s
@@ -268,9 +260,6 @@ void setup() {
 void loop() {
   pidCommand command;
   if (stringComplete) {
-    ParseCommand(receivedString, &command);
-    ExecuteCommand(&command);
-
     receivedString = "";  // clear the string
     stringComplete = false;
   }
@@ -439,34 +428,6 @@ bool SendTemperatureChannel(unsigned char channel) {
 
   averageTemperatureValue[channel] = temperature;
 
-
-#ifdef __SPLOT_ENABLED__
-  Serial.print("Ch");
-  Serial.print(channel);
-  Serial.print("--->Setpoint[°C]:");
-  Serial.print(PidSetpoint, 1);
-  Serial.print(",Temperature[°C]:");
-  Serial.print(temperature);
-  Serial.print(",PIDout:");
-  Serial.println(PidOutput[channel]);
-#endif
-
-#ifdef __TELEPLOT_ENABLED__
-  //Serial.print(channel);
-  Serial.print(">Setpoint(");
-  Serial.print(channel);
-  Serial.print(")[°C]:");
-  Serial.println(PidSetpoint, 1);
-  Serial.print(">Temperature(");
-  Serial.print(channel);
-  Serial.print(")[°C]:");
-  Serial.println(temperature);
-  Serial.print(">PIDout(");
-  Serial.print(channel);
-  Serial.print("):");
-  Serial.println(PidOutput[channel]);
-#endif
-
   temperatureValue[channel] = 0;
   return true;
 }
@@ -486,33 +447,6 @@ bool SendTemperatureChannelNTC(unsigned char channel) {
   temperature -= 273.15;                            // convert absolute temp to C
 
   averageTemperatureNTCValue[channel] = temperature;
-
-#ifdef __SPLOT_ENABLED__
-  Serial.print("Ch");
-  Serial.print(channel);
-  Serial.print("--->Setpoint[°C]:");
-  Serial.print(PidSetpoint, 1);
-  Serial.print(",Temperature[°C]:");
-  Serial.print(temperature);
-  Serial.print(",PIDout:");
-  Serial.println(PidOutput[channel]);
-#endif
-
-#ifdef __TELEPLOT_ENABLED__
-  //Serial.print(channel);
-  Serial.print(">Setpoint(");
-  Serial.print(channel);
-  Serial.print(")[°C]:");
-  Serial.println(PidSetpoint, 1);
-  Serial.print(">Temperature(");
-  Serial.print(channel);
-  Serial.print(")[°C]:");
-  Serial.println(temperature);
-  Serial.print(">PIDout(");
-  Serial.print(channel);
-  Serial.print("):");
-  Serial.println(PidOutput[channel]);
-#endif
 
   temperatureValueNTC[channel] = 0;
   return true;
@@ -535,24 +469,9 @@ bool SendCurrentChannel(unsigned char channel) {
   powerDensity[channel] *= Imax_R_LOAD; // Maximum current value during the initialization* R_LOAD
   powerDensity[channel] /= SAMPLE_SURFACE;
 
-#ifdef __TELEPLOT_ENABLED__
-#ifdef __SEND_CURRENT__
-  Serial.print(">Current(");
-  Serial.print(channel);
-  Serial.print(")[mA]:");
-  Serial.println(currentValue[channel], 1);
-#endif
-#ifdef __SEND_POWER_DENSITY__
-  Serial.print(">PowerDensity(");
-  Serial.print(channel);
-  Serial.print(")[W/m2]:");
-  Serial.println(powerDensity[channel], 2);
-#endif
-#endif
   currentValue[channel] = 0;
   return true;
 }
-
 
 bool CurrentCalibration(void) {
 
@@ -563,13 +482,6 @@ bool CurrentCalibration(void) {
 
   for (char channel = 0; channel < ANALOG_CHANNELS; channel++) {
     currentCalibrationValue[channel] = analogRead(currentSensingPin[channel]);
-
-#ifdef __DEBUG_ENABLED__
-    Serial.print("Calibration[");
-    Serial.print(channel);
-    Serial.print("]:");
-    Serial.println(currentCalibrationValue[channel]);
-#endif
   }
 
   for (char channel = 0; channel < ANALOG_CHANNELS; channel++)
@@ -577,7 +489,6 @@ bool CurrentCalibration(void) {
 
   return true;
 }
-
 
 /* Serial */
 void serialEvent() {
@@ -587,162 +498,6 @@ void serialEvent() {
     if (inChar == '\n') stringComplete = true;
   }
 }
-
-bool ParseCommand(String inputString, pidCommand *dataStream) {
-  /*
-  <command><ch>":"<value>
-  */
-
-  String inputStream = "";
-  String command = "";
-  String value = "";
-  char cmdIndex = 0;
-
-  inputString.trim();                                         // trim whitespaces, carriage return
-  cmdIndex = inputString.indexOf(":");                        // separator command to value
-  dataStream->parameter = inputString.substring(0, 2);        // put parameter in pidCommand struct
-  dataStream->channel = inputString.substring(2, 3).toInt();  // put channel in pidCommand struct
-
-  inputString = inputString.substring(cmdIndex + 1);  // remove command and ': from input string
-  if (inputString == PID_PARAMETER_GET_CHAR)
-    dataStream->value = PID_PARAMETER_GET_VALUE;
-  else
-    dataStream->value = inputString.toFloat();  // put value in pidCommand struct
-
-  return true;
-}
-
-bool ExecuteCommand(pidCommand *command) {
-  if (command->parameter == "" ||  //struct is in range
-      command->channel == 0xFF || command->value < PID_PARAMETER_GET_VALUE)
-    return false;
-
-  Serial.println("OK");
-  if (command->value == PID_PARAMETER_GET_VALUE) {  // Get value
-    if (!(command->parameter).compareTo("kp")) {
-#ifdef __TELEPLOT_ENABLED__
-      Serial.print(">kp");
-      Serial.print(command->channel);
-      Serial.print(":");
-      //Serial.println(Kp[command->channel]);
-      Serial.println(heaterController[command->channel].GetKp());
-#endif
-      Serial.print("kp");
-      Serial.print(command->channel);
-      Serial.print(":");
-      Serial.println(heaterController[command->channel].GetKp());
-    }
-    if (!(command->parameter).compareTo("ki")) {
-#ifdef __TELEPLOT_ENABLED__
-      Serial.print(">ki");
-      Serial.print(command->channel);
-      Serial.print(":");
-      Serial.println(heaterController[command->channel].GetKi());
-
-      Serial.print(">Ti");
-      Serial.print(command->channel);
-      Serial.print(":");
-      Serial.println(heaterController[command->channel].GetTi());
-#endif
-
-      Serial.print("ki");
-      Serial.print(command->channel);
-      Serial.print(":");
-      Serial.print(heaterController[command->channel].GetKi());
-
-      Serial.print(",Ti");
-      Serial.print(command->channel);
-      Serial.print(":");
-      Serial.println(heaterController[command->channel].GetTi());
-    }
-    if (!(command->parameter).compareTo("kd")) {
-#ifdef __TELEPLOT_ENABLED__
-      Serial.print(">kd");
-      Serial.print(command->channel);
-      Serial.print(":");
-      Serial.println(heaterController[command->channel].GetKd());
-
-      Serial.print(">Td");
-      Serial.print(command->channel);
-      Serial.print(":");
-      Serial.println(heaterController[command->channel].GetTd());
-#endif
-
-      Serial.print("kd");
-      Serial.print(command->channel);
-      Serial.print(":");
-      Serial.print(heaterController[command->channel].GetKd());
-
-      Serial.print(",Td");
-      Serial.print(command->channel);
-      Serial.print(":");
-      Serial.println(heaterController[command->channel].GetTd());
-    }
-    if (!(command->parameter).compareTo("sp")) {
-#ifdef __TELEPLOT_ENABLED__
-      Serial.print(">sp");
-      Serial.print(":");
-      Serial.println(PidSetpoint);
-#endif
-
-      Serial.print("sp");
-      Serial.print(":");
-      Serial.println(PidSetpoint);
-    }
-  } else {
-    if (!(command->parameter).compareTo("kp")) {  // if command to be executed is swoff
-      Kp[command->channel] = command->value;
-      heaterController[command->channel].SetTunings(Kp[command->channel], Ki[command->channel], Kd[command->channel]);
-    }
-    if (!(command->parameter).compareTo("ki")) {  // if command to be executed is swon
-      Ki[command->channel] = command->value;
-      heaterController[command->channel].SetTunings(Kp[command->channel], Ki[command->channel], Kd[command->channel]);
-    }
-    if (!(command->parameter).compareTo("kd")) {  // if command to be executed is swon
-      Kd[command->channel] = command->value;
-      heaterController[command->channel].SetTunings(Kp[command->channel], Ki[command->channel], Kd[command->channel]);
-    }
-    if (!(command->parameter).compareTo("sp")) {  // if command to be executed is swon
-      PidSetpoint = command->value;
-    }
-
-#ifdef __TELEPLOT_ENABLED__
-    Serial.print(">kp");
-    Serial.print(command->channel);
-    Serial.print(":");
-    Serial.println(heaterController[command->channel].GetKp());
-
-    Serial.print(">ki");
-    Serial.print(command->channel);
-    Serial.print(":");
-    Serial.println(heaterController[command->channel].GetKi());
-
-    Serial.print(">Ti");
-    Serial.print(command->channel);
-    Serial.print(":");
-    Serial.println(heaterController[command->channel].GetTi());
-
-    Serial.print(">kd");
-    Serial.print(command->channel);
-    Serial.print(":");
-    Serial.println(heaterController[command->channel].GetKd());
-
-    Serial.print(">Td");
-    Serial.print(command->channel);
-    Serial.print(":");
-    Serial.println(heaterController[command->channel].GetTd());
-
-    Serial.print(">sp");
-    Serial.print(":");
-    Serial.println(PidSetpoint);
-#endif
-
-    //heaterController[3].Initialize();
-  }
-  return true;
-}
-
-
 /**/
 void getDateTimeFromESP() {
   String dateTimeStr = "";  // Variable to store received date and time string
@@ -762,19 +517,6 @@ void getDateTimeFromESP() {
   sscanf(dateTimeStr.c_str(), "%d/%d/%d %d:%d:%d",
          &year, &month, &day, &hour, &minute, &second);
   Serial.print("Parsed Date and Time: ");
-  // Serial.print("Year: ");
-  // Serial.print(year);
-  // Serial.print(", Month: ");
-  // Serial.print(month);
-  // Serial.print(", Day: ");
-  // Serial.print(day);
-  // Serial.print(", Hour: ");
-  // Serial.print(hour);
-  // Serial.print(", Minute: ");
-  // Serial.print(minute);
-  // Serial.print(", Second: ");
-  // Serial.println(second);
-
   // Set RTC with received date and time
   rtc.adjust(DateTime(year, month, day, hour, minute, second));
   Serial.println("RTC synchronized with ESP8266 time.");
@@ -990,7 +732,6 @@ bool GenerateESPString(bool shieldPresent) {
 
   return true;
 }
-
 
 void loggingNTC() {
   for (int i = 0; i < numChannels; ++i) {
