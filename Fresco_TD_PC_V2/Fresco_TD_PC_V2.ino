@@ -38,7 +38,7 @@
 /* Analog FrontEnd parameters */
 #define R_SHUNT 1
 #define R_LOAD 100
-#define PSUPPLY_VOLTAGE 12
+#define PSUPPLY_VOLTAGE 12 //Update this value after measuring the voltage across the heater resistor and adjust the PID parameters accordingly
 #define R_AMPLI 39
 const float Sample_Surface_Default = 0.0036;
 float SAMPLE_SURFACE;
@@ -121,9 +121,9 @@ typedef struct _pidParameters {
 double PidSetpoint = 0;
 double PidInput[ANALOG_CHANNELS] = { 0, 0, 0, 0 };
 double PidOutput[ANALOG_CHANNELS] = { 0, 0, 0, 0 };
-double Kp[ANALOG_CHANNELS] = { 200, 0, 0, 200 };  // ok
-double Ki[ANALOG_CHANNELS] = { 0, 0, 0, 0 };      // ok
-double Kd[ANALOG_CHANNELS] = { 0, 0, 0, 0 };      // ok
+double Kp[ANALOG_CHANNELS] = { 200, 0, 0, 200 };  // Here the Proportional Gain PID parameter to be adjusted
+double Ki[ANALOG_CHANNELS] = { 0, 0, 0, 0 };      // Here the Integral Gain PID parameter to be adjusted
+double Kd[ANALOG_CHANNELS] = { 0, 0, 0, 0 };      // Here the Derivate Gain PID parameter to be adjusted
 
 pidParameters heaterControllerParameters[ANALOG_CHANNELS];
 
