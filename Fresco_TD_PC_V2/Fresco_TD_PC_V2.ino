@@ -87,9 +87,10 @@ int B = 3380;           //  K NTC part number NXFT15XH103FA2B100 or 3455
 //#define RESET_TIME 14400000 //time for reset function every 4 hours in milliseconds -- 7200000 (2 hours)
 //unsigned long ResetTime = RESET_TIME;
 //#define TASK1 3000                  //gettemp
-#define TASK1_default 2000
-#define TASK2_default 10000
+#define TASK1_default 1000
+#define TASK2_default 2000
 #define TASK3_default 3000
+#define TASK4_default 10000
 unsigned int TASK0 = 10;   	//gettemp fast reading before move mean
 unsigned int TASK1 = 1000;	//gettemp average
 unsigned int TASK2 = 2000;  //gettemp
@@ -576,12 +577,12 @@ void setParametersFromESP() {
     B = ntcBValue;
   }
   if (savingTime == 0 || savingTime < 1000) {
-    TASK1 = TASK1_default;  //  Saving time set to default
+    TASK2 = TASK2_default;  //  Saving time set to default
   } else {
     TASK2 = savingTime;
   }
   if (dataTransferTime == 0 || dataTransferTime < 5000) {
-    TASK1 = TASK2_default;  //  Saving time set to default
+    TASK4 = TASK4_default;  //  Saving time set to default
   } else {
     TASK4 = dataTransferTime;
   }
