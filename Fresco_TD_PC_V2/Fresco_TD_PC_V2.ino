@@ -578,12 +578,12 @@ void setParametersFromESP() {
   if (savingTime == 0 || savingTime < 1000) {
     TASK1 = TASK1_default;  //  Saving time set to default
   } else {
-    TASK1 = savingTime;
+    TASK2 = savingTime;
   }
   if (dataTransferTime == 0 || dataTransferTime < 5000) {
-    TASK1 = TASK1_default;  //  Saving time set to default
+    TASK1 = TASK2_default;  //  Saving time set to default
   } else {
-    TASK2 = dataTransferTime;
+    TASK4 = dataTransferTime;
   }
   if (displayingTime == 0 || displayingTime < 3000) {
     TASK3 = TASK3_default;  // Displaying time set to default
