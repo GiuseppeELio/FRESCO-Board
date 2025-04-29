@@ -11,7 +11,7 @@ The code reported in this repository are related to a data logger realization ab
 
 The board as shown in the figure is composed by a main board, a TDrop shield that allows measuring the temperature for multiple samples, the solar irradiance, the sky temperature using an IR sensor, ambient temperature and relative humidity using a DHT22, store data on a onboard SD card. It is also equipped with a RTC clock for the correct time and a ESP8266-12F module for the WiFi connection and communication. The PCool shield is equipped with NTC to measure the sample temperature and a PID system to warm-up them to the setting point temperature that usually is the ambient temperature. 
 
-The entire documentation will be soon available on the Zenodo repository at the following link [10.5281/zenodo.13624486](10.5281/zenodo.13624486)
+The entire documentation will be soon available on the Zenodo repository at the following link [https://doi.org/10.5281/zenodo.13919077](https://doi.org/10.5281/zenodo.13919077)
 
 Details about the research and the results obtained with FRESCO are available on the following "PrePrint":
 Wèrlè, Jeremy and Concas, Roberto and Pini, Ernesto and Wiersma, Diederik S. and Pattelli, Lorenzo and Lio, Giuseppe Emanuele and Administrator, Sneak Peek, FRESCO-Board: A Low-Cost Open Platform for Comprehensive Testing of Passive Radiative Cooling Materials. Available at SSRN: https://ssrn.com/abstract=5132927 or http://dx.doi.org/10.2139/ssrn.5132927
