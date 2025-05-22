@@ -25,7 +25,7 @@ The inventors of FRESCO acknowledge the economic support offered by the CoolingP
 ## A supporter is worth a thousand followers.
 
 Dear reader, if you are interested in the development of FRESCO and its improvement with new features, please support our team by using the support button or by going directly to 
-[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://buymeacoffee.com/gpplio93sx). We are actively working to do our best to achieve a reliable passive radiative cooling measurement apparatus. With your support we will move forward in developing new features, improve the web application experience and make it more essential for your experiments. You can support us directly buying coffees, with a membership and sooner directly buying the FRESCO boards. 
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://buymeacoffee.com/gpplio93sx). We are actively working to do our best to achieve a reliable passive radiative cooling measurement apparatus. With your support we will move forward in developing new features, improve the web application experience and make it more essential for your experiments. You can support us directly buying coffees or with a membership. 
 
 ##       Software details
 
