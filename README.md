@@ -13,8 +13,11 @@ The board as shown in the figure is composed by a main board, a TDrop shield tha
 
 The entire documentation will be soon available on the Zenodo repository at the following link [https://doi.org/10.5281/zenodo.13919077](https://doi.org/10.5281/zenodo.13919077)
 
-Details about the research and the results obtained with FRESCO are available on the following "PrePrint":
-Wèrlè, Jeremy and Concas, Roberto and Pini, Ernesto and Wiersma, Diederik S. and Pattelli, Lorenzo and Lio, Giuseppe Emanuele and Administrator, Sneak Peek, FRESCO-Board: A Low-Cost Open Platform for Comprehensive Testing of Passive Radiative Cooling Materials. Available at SSRN: https://ssrn.com/abstract=5132927 or http://dx.doi.org/10.2139/ssrn.5132927
+Details about the device desgin, research and the results obtained with FRESCO are available on the following paper [https://www.cell.com/cell-reports-physical-science/fulltext/S2666-3864(25)00287-5]
+
+You can refer or cite it using: 
+
+Werlé, J., Concas, R., Pini, E., Wiersma, D. S., Pattelli, L., & Lio, G. E. (2025). Open-hardware platform for synchronous performance testing of multiple passive radiative cooling materials. Cell Reports Physical Science.
 
 ## Acknowledgements.
 
